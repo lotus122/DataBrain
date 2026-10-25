@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN"><head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>DataBrain — AI 数据分析平台 Demo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%234f46e5'/%3E%3Cpath d='M18 42V22h7l7 12 7-12h7v20h-7V32l-7 11-7-11v10z' fill='white'/%3E%3C/svg%3E">
 <style>
 /* ============================================================
    CSS Variables & Design System
@@ -612,6 +613,71 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
 /* Full report expand/collapse */
 .full-report-section { display: none; margin-top: 16px; padding-top: 16px; border-top: 2px solid var(--accent); }
 .full-report-section.show { display: block; animation: fadeIn 0.3s ease; }
+
+/* 完整报告弹窗模式：悬浮展示，不占用对话流 */
+.full-report-section.report-popup-mode {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: min(960px, 94vw); max-height: 88vh; overflow-y: auto;
+  z-index: 1001; display: block; margin-top: 0; padding: 28px 32px;
+  background: var(--bg2); border-radius: var(--radius);
+  box-shadow: var(--shadow-lg); border-top: none;
+  animation: popIn 0.25s ease;
+}
+.report-popup-mask {
+  position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55);
+  z-index: 1000; display: none; animation: fadeIn 0.2s ease;
+}
+.report-popup-mask.show { display: block; }
+.report-popup-close {
+  position: sticky; top: 0; float: right; z-index: 5;
+  width: 32px; height: 32px; border: none; border-radius: 8px;
+  background: var(--bg); color: var(--muted); font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; font-family: var(--font);
+}
+.report-popup-close:hover { background: #fee2e2; color: var(--danger); }
+@keyframes popIn {
+  from { opacity: 0; transform: translate(-50%, -48%) scale(0.97); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* 意见反馈：轻量浮层（贴按钮浮出，无遮罩，不打断页面） */
+.fb-popover {
+  position: fixed; z-index: 1100; display: none;
+  width: min(560px, 92vw);
+  background: var(--bg2); border: 1px solid var(--rule); border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16), 0 2px 8px rgba(15, 23, 42, 0.06);
+  padding: 18px 20px 16px;
+}
+.fb-popover.show { display: block; animation: fbPopIn 0.16s ease; }
+.fb-popover-close {
+  position: absolute; top: 10px; right: 12px;
+  width: 26px; height: 26px; border: none; border-radius: 6px;
+  background: transparent; color: var(--muted); font-size: 13px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; font-family: var(--font);
+}
+.fb-popover-close:hover { background: var(--bg); color: var(--text); }
+.fb-popover-title { font-size: 14px; font-weight: 600; color: var(--text); margin: 0 28px 14px 0; }
+.fb-reasons { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.fb-chip {
+  padding: 6px 12px; border: 1px solid var(--rule); border-radius: 8px;
+  background: var(--bg2); color: var(--text); font-size: 12.5px; line-height: 1.4;
+  cursor: pointer; font-family: var(--font); transition: all 0.14s;
+}
+.fb-chip:hover { background: var(--bg); }
+.fb-chip.selected { background: #eef2ff; border-color: var(--accent); color: var(--accent); font-weight: 500; }
+.fb-footer { display: flex; gap: 10px; align-items: center; }
+.fb-input {
+  flex: 1; min-width: 0; padding: 10px 12px; border: none; border-radius: 8px;
+  background: var(--bg); color: var(--text); font-size: 13px; font-family: var(--font); outline: none;
+}
+.fb-input::placeholder { color: var(--muted); }
+.fb-submit {
+  flex-shrink: 0; padding: 10px 22px; border: none; border-radius: 8px;
+  background: var(--accent); color: #fff; font-size: 13px; font-weight: 600;
+  font-family: var(--font); cursor: pointer; transition: background 0.15s;
+}
+.fb-submit:hover { background: #4f46e5; }
+@keyframes fbPopIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
 .btn-view-full {
   display: inline-flex; align-items: center; gap: 6px;
@@ -727,6 +793,8 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
 .data-card-fields .field-chip.role-dimension .role-dot { background: #06b6d4; }
 .data-card-fields .field-chip.role-date .role-dot { background: #f59e0b; }
 .data-card-fields .field-chip.role-id .role-dot { background: #9ca3af; }
+.data-card-fields .field-chip.role-boolean .role-dot { background: #a855f7; }
+.data-card-fields .field-chip.role-boolean { border-color: #e9d5ff; color: #7e22ce; }
 .data-card-fields .field-chip.role-metric { border-color: #c7d2fe; color: #4338ca; }
 .data-card-fields .field-chip.role-dimension { border-color: #a5f3fc; color: #0e7490; }
 .data-card-fields .field-chip.role-date { border-color: #fde68a; color: #b45309; }
@@ -914,18 +982,30 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
    Responsive
    ============================================================ */
 @media (max-width: 768px) {
-  .sidebar { width: 60px; min-width: 60px; }
-  .sidebar .logo-text, .sidebar .logo-ver, .sidebar .nav-section, .sidebar .user-info { display: none; }
-  .nav-item { justify-content: center; padding: 10px; }
+  .sidebar { width: 64px; min-width: 64px; }
+  .sidebar-logo { justify-content: center; padding: 16px 8px; }
+  .sidebar .logo-text, .sidebar .logo-ver, .sidebar .nav-section, .sidebar .user-info, .conv-section, .nav-badge { display: none; }
+  .sidebar-footer { padding: 10px 8px; }
+  .avatar-btn { justify-content: center; }
+  .nav-item { justify-content: center; padding: 12px 8px; margin: 2px 8px; font-size: 0; }
+  .nav-item .nav-icon { font-size: 18px; }
   .dict-layout { flex-direction: column; }
   .dict-sidebar { width: 100%; min-width: auto; }
   .ds-panels { grid-template-columns: 1fr; }
   .report-grid { grid-template-columns: 1fr; }
   .profile-grid { grid-template-columns: 1fr; }
+  .metric-cards { grid-template-columns: 1fr; max-width: 100%; }
+  .demo-questions-table { max-width: 100%; }
+  .empty-upload-area { padding: 28px 18px; }
+  .page-header { padding: 14px 16px; }
+  .page-header h1 { font-size: 18px; }
   .page-content { padding: 16px; }
   .msg { max-width: 95%; }
   .form-row { grid-template-columns: 1fr; }
   .field-row { grid-template-columns: 1fr 80px 1fr auto; }
+  input[type="text"], input[type="email"], input[type="password"], input[type="search"], input:not([type]), textarea, select {
+    font-size: 16px !important;
+  }
 }
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -955,7 +1035,6 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
     <div class="nav-section">数据管理</div>
     <button class="nav-item" data-page="datasource" id="nav-ds">
       <span class="nav-icon">🗄️</span> 数据源
-      <span class="nav-badge" id="ds-badge">!</span>
     </button>
     <!-- 数据字典入口已移除：字段结构可在「数据源 → 已配置的表 → 查看元数据」中查看 -->
   </nav>
@@ -993,9 +1072,9 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
       <!-- Drag overlay -->
       <div class="chat-drop-overlay" id="chatDropOverlay">
         <div class="drop-overlay-content">
-          <div style="font-size:48px;margin-bottom:12px;">📊</div>
-          <div style="font-size:18px;font-weight:600;margin-bottom:4px;">松开鼠标上传数据文件</div>
-          <div style="font-size:13px;color:var(--muted);">支持 CSV / XLSX / XLS 格式</div>
+          <div style="font-size:48px; margin-bottom:12px">📊</div>
+          <div style="font-size:18px; font-weight:600; margin-bottom:4px">松开鼠标上传数据文件</div>
+          <div style="font-size:13px; color:var(--muted)">支持 CSV / XLSX / XLS 格式</div>
         </div>
       </div>
       <div class="chat-messages" id="chatMessages">
@@ -1004,11 +1083,11 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
       <div class="chat-input-area">
         <div class="chat-input-wrap">
           <button class="attach-btn" onclick="document.getElementById('chatFileInput').click()" title="上传数据文件">📎</button>
-          <textarea id="chatInput" placeholder="输入你的数据问题，或直接拖入 CSV/Excel 文件开始分析" rows="1" onkeydown="handleKeyDown(event)"></textarea>
-          <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled="">→</button>
+          <textarea id="chatInput" onkeydown="handleKeyDown(event)" placeholder="输入你的数据问题，或直接拖入 CSV/Excel 文件开始分析" rows="1"></textarea>
+          <button class="send-btn" disabled id="sendBtn" onclick="sendMessage()">→</button>
         </div>
 
-        <input type="file" id="chatFileInput" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleChatFileUpload(event)">
+        <input accept=".csv,.xlsx,.xls" id="chatFileInput" onchange="handleChatFileUpload(event)" type="file" style="display:none">
       </div>
     </div>
   </div>
@@ -1029,15 +1108,15 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
     <div class="page-content">
       <div class="report-toolbar">
         <div class="report-search-box">
-          <span style="font-size:14px;color:var(--muted);">🔍</span>
-          <input type="text" placeholder="搜索报表名称..." oninput="filterReports(this.value)" id="reportSearchInput">
+          <span style="font-size:14px; color:var(--muted)">🔍</span>
+          <input id="reportSearchInput" oninput="filterReports(this.value)" placeholder="搜索报表名称..." type="text">
         </div>
         <div class="report-time-tabs">
           <button class="time-tab active" onclick="filterReportsByTime('all', this)">全部</button>
           <button class="time-tab" onclick="filterReportsByTime('7', this)">最近7天</button>
-          <button class="time-tab" onclick="filterReportsByTime('30', this)">本月</button>
+          <button class="time-tab" onclick="filterReportsByTime('month', this)">本月</button>
         </div>
-        <span style="font-size:13px;color:var(--muted);margin-left:auto;" id="reportCount"></span>
+        <span id="reportCount" style="font-size:13px; color:var(--muted); margin-left:auto"></span>
       </div>
       <div class="report-grid" id="reportGrid"></div>
     </div>
@@ -1059,7 +1138,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
     <div class="page-content">
       <div class="ds-header">
         <div>
-          <p style="font-size:13px;color:var(--muted);">只需上传表结构元数据（表名、字段名、类型、描述），无需连接真实数据库。所有数据保存在本地浏览器中。</p>
+          <p style="font-size:13px; color:var(--muted)">只需上传表结构元数据（表名、字段名、类型、描述），无需连接真实数据库。所有数据保存在本地浏览器中。</p>
         </div>
       </div>
 
@@ -1067,8 +1146,8 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
         <div class="ds-panel">
           <h3>📤 上传数据文件</h3>
           <p>上传 <strong>CSV / Excel (.xlsx / .xls)</strong> 文件，系统自动解析表头、推断字段类型，并基于实际数据生成表结构。<strong>文件仅在浏览器本地解析，不会上传到服务器。</strong></p>
-          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:var(--radius-sm);padding:12px;margin-bottom:14px;">
-            <p style="font-size:12px;color:#166534;line-height:1.7;margin:0;">
+          <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:var(--radius-sm); padding:12px; margin-bottom:14px">
+            <p style="font-size:12px; color:#166534; line-height:1.7; margin:0">
               ✅ 支持格式：.csv / .xlsx / .xls<br>
               ✅ 首行作为字段名（表头）<br>
               ✅ 自动推断字段类型（数字/日期/文本）<br>
@@ -1078,11 +1157,11 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
           <div class="file-upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
             <div class="upload-icon">📊</div>
             <p>点击或拖拽 CSV/Excel 文件到此处</p>
-            <p style="margin-top:4px;"><strong>选择文件</strong></p>
+            <p style="margin-top:4px"><strong>选择文件</strong></p>
           </div>
-          <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleFileUpload(event)">
-          <p style="font-size:12px;color:var(--muted);margin-top:8px;">提示：上传后可预览数据、编辑表名和字段描述，确认后导入。</p>
-          <button class="btn btn-ghost btn-sm" style="margin-top:14px;color:var(--danger);" onclick="clearAllData()">清空所有数据</button>
+          <input accept=".csv,.xlsx,.xls" id="fileInput" onchange="handleFileUpload(event)" type="file" style="display:none">
+          <p style="font-size:12px; color:var(--muted); margin-top:8px">提示：上传后可预览数据、编辑表名和字段描述，确认后导入。</p>
+          <button class="btn btn-ghost btn-sm" onclick="clearAllData()" style="margin-top:14px; color:var(--danger)">清空所有数据</button>
         </div>
       </div>
 
@@ -1130,12 +1209,12 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
     <div class="modal-body">
       <div class="form-group">
         <label>表名 (英文)</label>
-        <input type="text" id="f-table-name" placeholder="如 sales_order">
+        <input id="f-table-name" placeholder="如 sales_order" type="text">
       </div>
       <div class="form-row">
         <div class="form-group">
           <label>中文别名</label>
-          <input type="text" id="f-table-alias" placeholder="如 销售订单表">
+          <input id="f-table-alias" placeholder="如 销售订单表" type="text">
         </div>
         <div class="form-group">
           <label>业务域</label>
@@ -1157,9 +1236,9 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
         <label>字段列表</label>
         <div class="field-rows" id="fieldRows">
           <div class="field-row">
-            <input type="text" placeholder="字段名" class="f-name">
-            <input type="text" placeholder="类型" class="f-type" value="varchar(50)">
-            <input type="text" placeholder="字段描述" class="f-desc">
+            <input class="f-name" placeholder="字段名" type="text">
+            <input class="f-type" placeholder="类型" type="text" value="varchar(50)">
+            <input class="f-desc" placeholder="字段描述" type="text">
             <button class="del-field" onclick="removeField(this)">×</button>
           </div>
         </div>
@@ -1175,7 +1254,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
 
 <!-- File Import Preview Modal -->
 <div class="modal-overlay" id="importModal">
-  <div class="modal" style="max-width:820px;">
+  <div class="modal" style="max-width:820px">
     <div class="modal-header">
       <h3>📥 预览并导入数据</h3>
       <button class="modal-close" onclick="closeImportModal()">×</button>
@@ -1192,12 +1271,12 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
 
 <!-- Report Detail Modal -->
 <div class="modal-overlay" id="reportModal" onclick="if(event.target===this)closeReportModal()">
-  <div class="modal" style="max-width:900px;width:92%;max-height:90vh;display:flex;flex-direction:column;">
+  <div class="modal" style="max-width:900px; width:92%; max-height:90vh; display:flex; flex-direction:column">
     <div class="modal-header">
       <h3 id="reportModalTitle">报表详情</h3>
       <button class="modal-close" onclick="closeReportModal()">×</button>
     </div>
-    <div class="modal-body" id="reportModalBody" style="overflow-y:auto;flex:1;min-height:0;">
+    <div class="modal-body" id="reportModalBody" style="overflow-y:auto; flex:1; min-height:0">
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline btn-sm" onclick="closeReportModal()">关闭</button>
@@ -1208,16 +1287,16 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
 
 <!-- Save report naming modal -->
 <div class="modal-overlay" id="saveReportModal" onclick="if(event.target===this)closeSaveReportModal()">
-  <div class="modal" style="max-width:460px;width:90%;">
+  <div class="modal" style="max-width:460px; width:90%">
     <div class="modal-header">
       <h3>💾 保存为报表</h3>
       <button class="modal-close" onclick="closeSaveReportModal()">×</button>
     </div>
-    <div class="modal-body" style="padding:24px;">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">将当前查询结果保存为报表，可在「智能报表」页面随时查看和管理。</p>
-      <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">报表名称</label>
-      <input type="text" id="saveReportNameInput" class="form-input" placeholder="请输入报表名称" style="width:100%;padding:10px 14px;border:1px solid var(--rule);border-radius:8px;font-size:14px;font-family:var(--font);outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--rule)'">
-      <div style="margin-top:12px;padding:10px 14px;background:var(--bg);border-radius:8px;font-size:12px;color:var(--muted);">
+    <div class="modal-body" style="padding:24px">
+      <p style="font-size:13px; color:var(--muted); margin-bottom:16px">将当前查询结果保存为报表，可在「智能报表」页面随时查看和管理。</p>
+      <label style="font-size:13px; font-weight:600; display:block; margin-bottom:6px">报表名称</label>
+      <input class="form-input" id="saveReportNameInput" onblur="this.style.borderColor='var(--rule)'" onfocus="this.style.borderColor='var(--accent)'" placeholder="请输入报表名称" type="text" style="width:100%; padding:10px 14px; border:1px solid var(--rule); border-radius:8px; font-size:14px; font-family:var(--font); outline:none; box-sizing:border-box">
+      <div style="margin-top:12px; padding:10px 14px; background:var(--bg); border-radius:8px; font-size:12px; color:var(--muted)">
         <span id="saveReportPreview"></span>
       </div>
     </div>
@@ -1228,12 +1307,23 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
   </div>
 </div>
 
+<!-- Feedback popover（差评意见，轻量浮层：贴操作按钮浮出，无遮罩） -->
+<div aria-label="意见反馈" class="fb-popover" id="feedbackPopover" role="dialog">
+  <button class="fb-popover-close" onclick="closeFeedbackPopover()" title="关闭" type="button">✕</button>
+  <div class="fb-popover-title">你觉得什么让你不满意？</div>
+  <div class="fb-reasons" id="fbReasons"></div>
+  <div class="fb-footer">
+    <input class="fb-input" id="fbComment" onkeydown="if(event.key==='Enter')submitFeedback()" placeholder="(可选) 告诉我们更多关于你的使用体验" type="text">
+    <button class="fb-submit" onclick="submitFeedback()" type="button">提交</button>
+  </div>
+</div>
+
 <!-- Toast Container -->
 <div id="toastContainer"></div>
 
 <!-- Netlify detects this form at deploy time and stores anonymous product events
      in the authenticated site dashboard. The user's uploaded dataset is never posted. -->
-<form hidden="" method="post" name="databrain-product-events">
+<form hidden method="post" name="databrain-product-events">
   <input name="form-name" value="databrain-product-events">
   <input name="bot-field">
   <input name="event_type">
@@ -1260,8 +1350,6 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
 <script src="vendor/xlsx.full.min.js"></script>
 <script src="vendor/html2canvas.min.js"></script>
 <script src="vendor/jspdf.umd.min.js"></script>
-<!-- 运行时环境配置：从 js/config.example.js 复制为 js/config.js 后填写；config.js 不入库 -->
-<script src="js/config.js"></script>
 <script>
 /* ============================================================
    Anonymous product evaluation telemetry
@@ -1281,13 +1369,19 @@ function telemetryRandomId(prefix) {
   return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
+function getUnifiedSessionId() {
+  try {
+    var sid = localStorage.getItem('databrain_sid');
+    if (!sid) {
+      sid = (window.crypto && crypto.randomUUID) ? ('s_' + crypto.randomUUID()) : ('s_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10));
+      localStorage.setItem('databrain_sid', sid);
+    }
+    return sid;
+  } catch (e) { return 'anon'; }
+}
+// 统一三套 session id：telemetry / page_click / DM_TRACK 全部复用同一标识
 function getTelemetrySessionId() {
-  let id = sessionStorage.getItem('databrain_telemetry_session');
-  if (!id) {
-    id = telemetryRandomId('s');
-    sessionStorage.setItem('databrain_telemetry_session', id);
-  }
-  return id;
+  return getUnifiedSessionId();
 }
 
 function isProductTelemetryEnabled() {
@@ -1539,11 +1633,6 @@ function isDemoMode() {
   return Object.keys(tables).length > 0 && !hasUserTables();
 }
 
-// Explicit demo-sandbox view flag: when true, the chat empty state shows the
-// demo experience (3 sample tables) even if the user has uploaded their own
-// tables. Set by enterDemoMode(), cleared by exitDemoMode() / uploading data.
-let demoViewActive = false;
-
 // Ensure the 3 demo tables ALWAYS exist — they are permanent fixtures and
 // must never be hidden or removed, even after the user uploads their own data
 function ensureDefaultData() {
@@ -1575,32 +1664,17 @@ const DEFAULT_METRICS = [
   { id: 'pie',  icon: '🥧', iconClass: 'pie',  title: '用户等级分布',       desc: '了解不同等级的用户数量分布', query: '各用户等级的用户数', chart: 'pie' }
 ];
 
-// Default recommended questions for demo mode
-const DEFAULT_QUESTIONS = [
-  { icon: '📊', text: '按销售渠道统计销售金额', cat: '分组统计' },
-  { icon: '📈', text: '销售数量趋势分析', cat: '趋势分析' },
-  { icon: '🏆', text: '品类利润排名前5', cat: '排行' },
-  { icon: '🥧', text: '各用户等级的用户数', cat: '占比' },
-  { icon: '📊', text: '按商品品类统计利润', cat: '分组统计' },
-  { icon: '📈', text: '各渠道销售数量趋势', cat: '趋势分析' },
-  { icon: '🏆', text: '商品利润排名前5', cat: '排行' },
-  { icon: '📋', text: '销售订单表有哪些字段？', cat: '数据字典' }
-];
-
 function updateDSBadge() {
-  const count = Object.keys(tables).length;
-  const badge = document.getElementById('ds-badge');
+  // Only count user-uploaded tables — demo/sample tables never count
+  const userTables = Object.values(tables).filter(t => !t.isDefault);
+  const count = userTables.length;
   const chatBadge = document.getElementById('ds-chat-badge');
   document.getElementById('ds-count-tables').textContent = count;
   let fieldCount = 0;
-  Object.values(tables).forEach(t => fieldCount += (t.fields||[]).length);
+  userTables.forEach(t => fieldCount += (t.fields||[]).length);
   document.getElementById('ds-count-fields').textContent = fieldCount;
   if (chatBadge) chatBadge.textContent = count + ' 张表';
   if (chatBadge) chatBadge.className = 'ds-badge' + (count === 0 ? ' empty' : '');
-  if (badge) {
-    if (count === 0) { badge.style.display = ''; badge.textContent = '!'; }
-    else { badge.style.display = 'none'; }
-  }
 }
 
 /* ============================================================
@@ -1844,8 +1918,7 @@ function newConversation() {
   }
   // Reset asked questions tracker for new conversation
   askedQuestions = new Set();
-  // Demo tables follow the current mode: inside 体验模式 they stay (3 张),
-  // after exiting demo the real home stays at 0 tables. Never force-load here.
+  // Tables persist across conversations; never force-load demo tables here.
   saveTables(tables);
   renderDSTable();
   // Create new conversation
@@ -1954,51 +2027,11 @@ function renderChatEmpty(uploadOnly) {
   const tableCount = Object.keys(tables).length;
 
   let content = '';
-  // ── Demo mode: show 4 preset metric cards for instant experience ──
-  if (isDemoMode() || demoViewActive) {
-    content = `
-      <div class="demo-banner"><span class="dot"></span> 体验模式 · 示例数据已就绪，点击下方指标即可查看分析<span class="back-home-btn" onclick="exitDemoMode()">← 返回主页</span></div>
-      <h2>常用指标 · 一键体验</h2>
-      <p>无需上传数据，直接点击卡片即可生成分析报表</p>
-      <div class="metric-cards">
-        ${DEFAULT_METRICS.map(m => `
-          <div class="metric-card" onclick="triggerDefaultMetric('${m.id}')">
-            <div class="mc-icon ${m.iconClass}">${m.icon}</div>
-            <div class="mc-title">${m.title}</div>
-            <div class="mc-desc">${m.desc}</div>
-          </div>
-        `).join('')}
-      </div>
-      <div class="demo-upload-hint">
-        <p>想用自己的数据？上传文件后将退出体验模式，切换到真实数据</p>
-        <div class="demo-upload-btn" onclick="document.getElementById('chatFileInput').click()">
-          📎 上传我的数据
-        </div>
-      </div>
-      <div class="demo-questions-table">
-        <h3>💡 推荐问题</h3>
-        <table class="questions-table">
-          <thead>
-            <tr><th style="width:40px;">类型</th><th>问题</th><th style="width:90px;">分类</th><th style="width:100px;">数据表</th></tr>
-          </thead>
-          <tbody>
-            ${DEFAULT_QUESTIONS.map((q, idx) => `
-              <tr class="qt-row" onclick="askQuestionFromTable('${q.text.replace(/'/g, "\\'")}')">
-                <td class="qt-icon">${q.icon}</td>
-                <td class="qt-text">${q.text}</td>
-                <td class="qt-cat">${q.cat}</td>
-                <td class="qt-table">销售订单表</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>`;
-  } else if (uploadOnly || tableCount === 0) {
-    // Upload zone — shown when new conversation (uploadOnly=true) OR no tables exist
-    const hasExistingData = tableCount > 0;
+  if (uploadOnly || tableCount === 0) {
+    // Upload zone — shown when new conversation (uploadOnly=true) OR no tables exist.
+    // Single main page: demo cards here run analysis directly (no 体验模式 state).
     content = `
       <h2>上传你的数据文件开始分析</h2>
-      <p>支持 CSV / XLSX / XLS 格式，文件仅在浏览器本地解析，不会上传服务器</p>
       <div class="empty-upload-area" onclick="document.getElementById('chatFileInput').click()"
            ondragover="event.preventDefault();this.style.borderColor='var(--accent)';this.style.background='#eef2ff';"
            ondragleave="this.style.borderColor='';this.style.background='';"
@@ -2006,13 +2039,18 @@ function renderChatEmpty(uploadOnly) {
         <div style="font-size:48px;margin-bottom:12px;">📂</div>
         <div style="font-size:16px;font-weight:600;color:var(--ink);margin-bottom:6px;">点击或拖拽文件到此处上传</div>
         <div style="font-size:13px;color:var(--muted);">支持 .csv / .xlsx / .xls 文件</div>
-      </div>${hasExistingData ? `
-      <div style="margin-top:12px;text-align:center;">
-        <p style="font-size:13px;color:var(--muted);">已检测到已有数据，也可直接输入问题进行分析</p>
-      </div>` : ''}
-      <div style="margin-top:16px;padding-top:16px;border-top:1px dashed var(--rule);text-align:center;">
-        <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">还没有数据？点击下方体验示例指标</p>
-        <button class="btn btn-outline btn-sm" onclick="enterDemoMode()" style="font-size:12px;">查看推荐问题 →</button>
+      </div>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px dashed var(--rule);">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:10px;text-align:center;">不知道从哪开始？点击卡片用示例数据体验</p>
+        <div class="metric-cards">
+          ${DEFAULT_METRICS.map(m => `
+            <div class="metric-card" onclick="triggerDefaultMetric('${m.id}')">
+              <div class="mc-icon ${m.iconClass}">${m.icon}</div>
+              <div class="mc-title">${m.title}</div>
+              <div class="mc-desc">${m.desc}</div>
+            </div>
+          `).join('')}
+        </div>
       </div>`;
   } else {
     // ── User has uploaded data: show suggested metric cards based on their fields ──
@@ -2032,7 +2070,7 @@ function renderChatEmpty(uploadOnly) {
     let metricFields = fields.filter(f => f.role === 'metric' && !f.pk);
     if (metricFields.length === 0) {
       metricFields = fields.filter(f =>
-        !f.pk && f.role !== 'id' && f.role !== 'date' &&
+        !f.pk && f.role !== 'id' && f.role !== 'date' && f.role !== 'boolean' &&
         !/(^|_)id$|^id$/i.test(f.name) &&
         !/编号|号码|单号|序号/i.test(f.desc || f.alias || '') &&
         /decimal|int|float|bigint|double|number|numeric/i.test(f.type)
@@ -2040,7 +2078,7 @@ function renderChatEmpty(uploadOnly) {
     }
     // Find dimension fields
     let dimFields = fields.filter(f =>
-      f.role === 'dimension' && !/date|time/i.test(f.type) && f.role !== 'id' && !/(^|_)id$|^id$/i.test(f.name) && !f.pk
+      (f.role === 'dimension' || f.role === 'boolean') && !/date|time/i.test(f.type) && f.role !== 'id' && !/(^|_)id$|^id$/i.test(f.name) && !f.pk
     );
     if (dimFields.length === 0) {
       dimFields = fields.filter(f =>
@@ -2223,42 +2261,6 @@ function triggerDefaultMetric(metricId) {
   sendMessage();
 }
 
-// Enter demo mode: load demo data and show metric cards
-function enterDemoMode() {
-  // Demo is an independent sandbox: always show the 3 sample tables here,
-  // regardless of whether the user has uploaded their own data. User tables
-  // are untouched and remain available in real mode.
-  demoViewActive = true;
-  ensureDefaultData();
-  saveTables(tables);
-  renderDSTable();
-  updateDSBadge();
-  renderChatEmpty(true);
-}
-
-// Exit demo mode: return to the REAL home (upload zone). Demo and real modes
-// are strictly separated — leaving demo removes the 3 sample tables, so the
-// real home shows 0 tables until the user uploads their own data.
-function exitDemoMode() {
-  demoViewActive = false;
-  Object.keys(tables).forEach(k => { if (tables[k].isDefault) delete tables[k]; });
-  saveTables(tables);
-  renderDSTable();
-  updateDSBadge();
-  // ── Switch to the 主页 (新建查询) view ──
-  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-  const chatNav = document.querySelector('[data-page=chat]');
-  if (chatNav) chatNav.classList.add('active');
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  const chatPage = document.getElementById('page-chat');
-  if (chatPage) chatPage.classList.add('active');
-  // Clear current conversation content and show the real home:
-  // user's data home if they have tables, upload zone otherwise
-  chatMessages.innerHTML = '<div class="chat-empty" id="chatEmpty"></div>';
-  renderChatEmpty(false);
-  if (chatPage) chatPage.scrollTo ? chatPage.scrollTo(0, 0) : chatPage.scrollTop = 0;
-}
-
 // Ask a question from the recommended questions table
 function askQuestionFromTable(question) {
   chatInput.value = question;
@@ -2275,11 +2277,22 @@ function triggerUserMetric(idx) {
   sendMessage();
 }
 
-// Trigger a metric card from the upload response
+// Trigger a metric card from the upload response (legacy index-based, kept for old saved cards)
 function triggerUploadMetric(idx) {
   const queries = window._uploadMetricQueries || [];
   if (idx < 0 || idx >= queries.length) return;
   chatInput.value = queries[idx];
+  chatInput.dispatchEvent(new Event('input'));
+  sendMessage();
+}
+
+// Click an upload-response metric card: use the query text carried by the card itself.
+// 修复：多表上传时 window._uploadMetricQueries 会被后一次上传覆盖，
+// 旧的下标方式会点出另一张表的问题；改为从卡片 data-query 读取，所见即所问。
+function triggerUploadMetricFromCard(el) {
+  const q = el && el.getAttribute ? el.getAttribute('data-query') : null;
+  if (!q) return;
+  chatInput.value = q;
   chatInput.dispatchEvent(new Event('input'));
   sendMessage();
 }
@@ -2298,8 +2311,6 @@ function sendMessage() {
   // Save immediately to update conversation order
   saveCurrentConversation();
   renderConvList();
-  // Mode separation: do NOT auto-load demo tables here. Inside 体验模式 they
-  // are already present; in real mode the user should be prompted to upload.
   // Greeting / small talk detection — don't treat as data query (check before table requirement)
   const smallTalkReply = detectSmallTalk(text);
   if (smallTalkReply) {
@@ -2308,9 +2319,8 @@ function sendMessage() {
   }
   let tableCount = Object.keys(tables).length;
   if (tableCount === 0) {
-    // No tables yet — asking a question (e.g. from recommended questions)
-    // implicitly enters 体验模式: auto-load the 3 sample tables and answer
-    // directly, no upload required.
+    // No tables yet — asking a question (e.g. from a demo metric card)
+    // auto-loads the 3 sample tables and answers directly, no upload required.
     ensureDefaultData();
     tableCount = Object.keys(tables).length;
     if (tableCount > 0) {
@@ -2325,9 +2335,15 @@ function sendMessage() {
       </div>`);
     return;
   }
+  // P0-2 4.4: 空提问拦截
+  if (!text || text.trim().length === 0) {
+    addMessage('assistant', '请输入你的问题，例如：各地区的销售额统计、销售额 Top5、按月销售趋势。');
+    return;
+  }
   const flow = detectFlow(text);
   if (flow === 'unknown') {
-    addMessage('assistant', '抱歉，我无法理解这个问题。我目前仅支持数据分析相关的提问，请尝试用数据查询的方式提问。');
+    if (window.DM_TRACK) DM_TRACK.queryUnrecognized({ query_text: text, reason: 'intent_not_recognized' });
+    addMessage('assistant', '抱歉，我无法理解这个问题。' + buildUnknownHelp(tables[Object.keys(tables)[0]]));
     return;
   }
   currentTelemetryQuery = {
@@ -2344,7 +2360,19 @@ function sendMessage() {
     status: 'started',
     table_count: tableCount
   });
+  if (window.DM_TRACK) DM_TRACK.querySubmit({ query_text: text, intent: flow, conversation_id: currentTelemetryQuery ? currentTelemetryQuery.id : '' });
   simulateAgentPipeline(flow, text);
+}
+
+// 生成表的「去重指纹」：字段结构 + 行数 + 内容采样(前2行+后2行)。
+// 按内容去重（不限文件名）——结构+数据一致的表视为同一张表，只保留一份，
+// 同时因采样含实际数据，结构相同但内容不同的表不会被误删。
+function buildTableSignature(baseName, fields, rows) {
+  const cols = (fields || []).map(f => `${f.name}|${f.type}`).join(',');
+  const n = rows ? rows.length : 0;
+  const sample = [rows && rows[0], rows && rows[1], rows && rows[n - 2], rows && rows[n - 1]]
+    .filter(r => r).map(r => JSON.stringify(r)).join('|');
+  return `${cols}###${n}###${sample}`;
 }
 
 // Handle file upload directly in chat
@@ -2370,9 +2398,12 @@ function handleChatFileUpload(e) {
   if (ext !== 'csv' && XLSX.__csvFallback) {
     updateThinking(thinkingMsg, '❌ Excel 解析组件未加载，请刷新页面后重试；CSV 文件仍可正常导入。');
     e.target.value = '';
+    if (window.DM_TRACK) DM_TRACK.fileUploadFail({ file_name: file.name, error_code: 'excel_component_missing', error_reason: 'Excel 解析组件未加载', file_format: ext });
     return;
   }
 
+  const _dmUpStart = Date.now();
+  if (window.DM_TRACK) DM_TRACK.fileUploadStart({ file_name: file.name, file_size_kb: Math.round(file.size/1024), file_format: ext });
   const reader = new FileReader();
   reader.onload = (ev) => {
     try {
@@ -2380,6 +2411,7 @@ function handleChatFileUpload(e) {
       const workbook = XLSX.read(data, { type: 'array', cellDates: true, codepage: 65001 });
       const sheets = workbook.SheetNames;
       let addedTables = [];
+      let duplicateCount = 0; // 与已有表内容相同的重复张数（用于提示与跳过导入）
 
       sheets.forEach(sheetName => {
         const ws = workbook.Sheets[sheetName];
@@ -2395,6 +2427,7 @@ function handleChatFileUpload(e) {
           const cnAlias = inferChineseAlias(rawHeader);
           return {
             name: h || `col_${i+1}`,
+            header: rawHeader,
             alias: cnAlias || rawHeader,
             type: inferType(colValues),
             desc: cnAlias || rawHeader,
@@ -2411,6 +2444,17 @@ function handleChatFileUpload(e) {
             if (field && /decimal|int|float|bigint|double|number|numeric/i.test(field.type)) {
               const n = parseNumeric(val);
               val = n !== null ? n : 0;
+            }
+            // 日期列规范化：2026.3.16 / 20260317 / 15-03-2026 等统一为 YYYY-MM-DD[ HH:mm:ss]
+            if (field && /^date$|^datetime$|^timestamp$/i.test(field.type)) {
+              const d = parseDate(val);
+              if (d) {
+                const pad = n => String(n).padStart(2, '0');
+                const ds = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+                val = /time/i.test(field.type)
+                  ? ds + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds())
+                  : ds;
+              }
             }
             obj[h] = val;
           });
@@ -2463,6 +2507,12 @@ function handleChatFileUpload(e) {
         const dataRows = allRows;
         const nameSource = sheets.length > 1 ? `${file.name.replace(/\.(csv|xlsx|xls)$/i,'')}_${sheetName}` : file.name;
         const tableName = fileNameToTable(nameSource);
+        // 去重：与已有表「同名 + 同字段结构 + 同内容指纹」视为同一张表，跳过重复导入
+        const newSig = buildTableSignature(tableName, fields, allRows);
+        if (Object.values(tables).some(t => t._sig && t._sig === newSig)) {
+          duplicateCount++;
+          return; // forEach 回调中跳过本 sheet（continue 非法）
+        }
         // Avoid name collision
         let finalName = tableName;
         let counter = 1;
@@ -2473,7 +2523,7 @@ function handleChatFileUpload(e) {
           ? `${baseAlias} - ${sheetName}`
           : baseAlias;
         tables[finalName] = {
-          name: finalName, alias: tableAlias, group: '上传数据',
+          name: finalName, alias: tableAlias, group: '上传数据', _sig: newSig,
           desc: `从 ${file.name} 导入（Sheet: ${sheetName}），共 ${rawRows.length} 行数据`,
           fields, sampleRows, dataRows, rawHeaders: headers, totalRows: rawRows.length
         };
@@ -2481,7 +2531,11 @@ function handleChatFileUpload(e) {
       });
 
       if (addedTables.length === 0) {
-        updateThinking(thinkingMsg, '❌ 文件中没有有效数据（需要包含表头和至少1行数据）');
+        if (duplicateCount > 0) {
+          updateThinking(thinkingMsg, `⚠️ 该文件与已上传的表内容完全相同，已跳过重复导入，数据源中仅保留一份（共 ${duplicateCount} 张重复）。`);
+        } else {
+          updateThinking(thinkingMsg, '❌ 文件中没有有效数据（需要包含表头和至少1行数据）');
+        }
         return;
       }
 
@@ -2498,14 +2552,14 @@ function handleChatFileUpload(e) {
         let tMetricFields = tFields.filter(f => f.role === 'metric' && !f.pk);
         if (tMetricFields.length === 0) {
           tMetricFields = tFields.filter(f =>
-            !f.pk && f.role !== 'id' && f.role !== 'date' &&
+            !f.pk && f.role !== 'id' && f.role !== 'date' && f.role !== 'boolean' &&
             !/(^|_)id$|^id$/i.test(f.name) &&
             !/编号|号码|单号|序号/i.test(f.desc || f.alias || '') &&
             /decimal|int|float|bigint|double|number|numeric/i.test(f.type)
           );
         }
         let tDimFields = tFields.filter(f =>
-          f.role === 'dimension' && !/date|time/i.test(f.type) && f.role !== 'id' && !/(^|_)id$|^id$/i.test(f.name) && !f.pk
+          (f.role === 'dimension' || f.role === 'boolean') && !/date|time/i.test(f.type) && f.role !== 'id' && !/(^|_)id$|^id$/i.test(f.name) && !f.pk
         );
         if (tDimFields.length === 0) {
           tDimFields = tFields.filter(f =>
@@ -2529,18 +2583,18 @@ function handleChatFileUpload(e) {
         const tTableLabel = t.alias || t.name;
 
         if (tDimFields.length > 0 && tMetricFields.length > 0) {
-          uploadedMetrics.push({ icon: '📊', iconClass: 'bar', chart: 'bar', title: `按${tDimName}统计${tMetricName}`, desc: `对比各${tDimName}的${tMetricName}表现`, query: `按${tDimName}统计${tMetricName}` });
+          uploadedMetrics.push({ icon: '📊', iconClass: 'bar', chart: 'bar', title: `按${tDimName}统计${tMetricName}`, desc: `对比各${tDimName}的${tMetricName}表现`, query: `按${tDimName}统计${tTableLabel}的${tMetricName}` });
         }
         if (tDateFields.length > 0 && tMetricFields.length > 0) {
-          uploadedMetrics.push({ icon: '📈', iconClass: 'line', chart: 'line', title: `${tMetricName}趋势分析`, desc: `查看${tMetricName}随时间的变化趋势`, query: `${tMetricName}趋势分析` });
+          uploadedMetrics.push({ icon: '📈', iconClass: 'line', chart: 'line', title: `${tMetricName}趋势分析`, desc: `查看${tMetricName}随时间的变化趋势`, query: `${tTableLabel}的${tMetricName}趋势分析` });
         }
         if (tDimFields.length > 0 && tMetricFields.length > 0) {
           uploadedMetrics.push({ icon: '🏆', iconClass: 'topn', chart: 'bar', title: `${tDimName}的${tMetricName}排名`, desc: `找出${tMetricName}最高的${tDimName}`, query: `${tTableLabel}的${tMetricName}排名前5` });
         }
         if (tDimFields.length > 1 && tMetricFields.length > 0) {
-          uploadedMetrics.push({ icon: '🥧', iconClass: 'pie', chart: 'pie', title: `按${tSecondDim}统计${tMetricName}`, desc: `了解各${tSecondDim}的${tMetricName}分布`, query: `按${tSecondDim}统计${tMetricName}` });
+          uploadedMetrics.push({ icon: '🥧', iconClass: 'pie', chart: 'pie', title: `按${tSecondDim}统计${tMetricName}`, desc: `了解各${tSecondDim}的${tMetricName}分布`, query: `按${tSecondDim}统计${tTableLabel}的${tMetricName}` });
         } else if (tDimFields.length > 0 && tMetricFields.length > 1) {
-          uploadedMetrics.push({ icon: '🔢', iconClass: 'bar', chart: 'bar', title: `按${tDimName}统计${tSecondMetric}`, desc: `从${tSecondMetric}角度对比各${tDimName}`, query: `按${tDimName}统计${tSecondMetric}` });
+          uploadedMetrics.push({ icon: '🔢', iconClass: 'bar', chart: 'bar', title: `按${tDimName}统计${tSecondMetric}`, desc: `从${tSecondMetric}角度对比各${tDimName}`, query: `按${tDimName}统计${tTableLabel}的${tSecondMetric}` });
         } else if (tFields.length > 0) {
           uploadedMetrics.push({ icon: '📋', iconClass: 'bar', chart: 'bar', title: `${tTableLabel}有哪些字段？`, desc: `查看数据表的字段结构`, query: `${tTableLabel}有哪些字段？` });
         }
@@ -2557,19 +2611,25 @@ function handleChatFileUpload(e) {
         <p style="font-size:13px;color:var(--muted);margin-bottom:8px;">基于你的数据字段智能推荐，点击卡片即可生成分析报表</p>
         <div class="metric-cards">
           ${uploadedMetrics.map((m, idx) => `
-            <div class="metric-card" onclick="triggerUploadMetric(${idx})">
+            <div class="metric-card" data-query="${escapeAttr(m.query)}" onclick="triggerUploadMetricFromCard(this)">
               <div class="mc-icon ${m.iconClass}">${m.icon}</div>
               <div class="mc-title">${m.title}</div>
               <div class="mc-desc">${m.desc}</div>
             </div>
           `).join('')}
         </div>`;
+      if (window.DM_TRACK) DM_TRACK.fileUploadSuccess({ file_name: file.name, row_count: addedTables.reduce((a,t)=>a+(t.totalRows||0),0), column_count: (addedTables[0]&&addedTables[0].fields?addedTables[0].fields.length:0), parse_duration_ms: Date.now()-_dmUpStart });
       updateThinking(thinkingMsg, cardHTML);
+      // 部分表与已上传内容相同：提示已跳过重复，数据源仅保留一份
+      if (duplicateCount > 0) {
+        showToast(`已跳过 ${duplicateCount} 张重复表（内容相同），数据源中仅保留一份`);
+      }
       // Save conversation after file upload completes
       setTimeout(() => saveCurrentConversation(), 500);
     } catch(err) {
       console.error(err);
       updateThinking(thinkingMsg, '❌ 文件解析失败: ' + err.message);
+      if (window.DM_TRACK) DM_TRACK.fileUploadFail({ file_name: file.name, error_code: 'parse_error', error_reason: (err&&err.message)||'parse_error', file_format: (file.name.split('.').pop()||'').toLowerCase() });
     }
   };
   reader.readAsArrayBuffer(file);
@@ -2670,6 +2730,12 @@ function textContainsFieldKeyword(text) {
       }
     }
   }
+  // Phase 3: 部分别名兜底（如"耗时"⊂"问题耗时"、"客户"⊂"客户名称"）——避免自由说法被判"听不懂"
+  for (const name of Object.keys(tables)) {
+    for (const f of (tables[name].fields || [])) {
+      if (fieldMatchScore(text, f) > 0) return true;
+    }
+  }
   return false;
 }
 
@@ -2754,6 +2820,42 @@ function detectSmallTalk(text) {
   return null;
 }
 
+// 单值聚合问句：问"总/平均/最大/最小/去重"且不带分组词/明细词，
+// 也不以"最X的<实体>"结尾（那是排行问句）→ 用户只要一个数字，不套分组
+function isSingleValueAggQuery(text) {
+  const t = String(text || '').toLowerCase().trim();
+  const hasAggWord = /(?:一起|总共|总计|合计|累计|求和|总和|平均|均值|人均|每单|最大值|最小值|最大|最小|最高|最低|峰值|谷值|去重|几种)/.test(t)
+    || /总\s*(?:的)?\s*(?:销售额|销售|金额|数量|利润|成本|价格|售价|单价|营收|收入|消费|花费|流水|交易|订单|用户|记录|人数|个数|数目|库存|产量|销量)/.test(t);
+  if (!hasAggWord) return false;
+  if (/按|各|分别|每\s*[月日天年周季]|月度|日度|年度|每周|每天|每日|分布|趋势|走势|排名|排行|top\s*\d|前\s*\d|对比|比较|vs|分组|细分/.test(t)) return false;
+  if (/明细|详情|列出|有哪些|哪些是|哪些|显示|查看|查询|查一下|看一下|找出|搜索|筛选|过滤|清单|哪个|哪一|哪家|哪几|哪种/.test(t)) return false;
+  if (/(?:订单|记录|数据|商品|用户|客户|会员|买家|地区|城市|渠道|品类|部门|类型|等级|级别|品牌|门店|产品|供应商|仓库)\s*$/.test(t)) return false;
+  return true;
+}
+
+// 查询中出现了已上传表的维度取值（如「新客」「金卡」）→ 自然语言查询，避免直接 unknown
+function queryMentionsDimValue(text) {
+  const t = String(text || '').toLowerCase();
+  for (const name of Object.keys(tables)) {
+    const tbl = tables[name] || {};
+    for (const f of (tbl.fields || [])) {
+      if (f.pk || f.role === 'id') continue;
+      if (/decimal|int|float|bigint|double|number|numeric|date|time/i.test(f.type)) continue;
+      const vals = new Set();
+      for (const row of (tbl.dataRows || [])) {
+        const v = row[f.name];
+        if (v != null && v !== '') vals.add(String(v).trim());
+        if (vals.size > 30) break;
+      }
+      if (vals.size > 30) continue; // 高基数字段（名称/备注）不参与路由
+      for (const v of vals) {
+        if (v.length >= 2 && t.includes(v.toLowerCase())) return true;
+      }
+    }
+  }
+  return false;
+}
+
 function detectFlow(text) {
   const t = text.toLowerCase();
   // 指标识别：用户是在询问“有哪些指标/指标是哪几个”，不是要求自动推荐分析
@@ -2783,8 +2885,10 @@ function detectFlow(text) {
   }
   // 数据字典/表结构查询
   if (t.includes('字段') || t.includes('表有') || t.includes('什么意思') || t.includes('结构') || t.includes('查看字段') || t.includes('数据字典') || t.includes('有哪些字段')) return 'dict';
+  // 单值聚合问句（总/平均/最大/最小/去重，无分组词）→ 直接给一个数，优先于 TopN（避免「最大金额是多少」被 最大 抢走）
+  if (isSingleValueAggQuery(text)) return 'query';
   // Top N / 排名查询必须优先于通用“有哪些”明细词
-  if (/top\s*\d+/i.test(t) || t.includes('top') || t.includes('排名') || t.includes('最高') || t.includes('最低') || t.includes('最好') || t.includes('最差') || (t.includes('前') && /\d+/.test(t)) || t.includes('排行') || t.includes('第一名') || t.includes('首位')) return 'topn';
+  if (/top\s*\d+/i.test(t) || t.includes('top') || t.includes('排名') || t.includes('最高') || t.includes('最低') || t.includes('最好') || t.includes('最差') || t.includes('最多') || t.includes('最少') || t.includes('最长') || t.includes('最短') || t.includes('最大') || t.includes('最小') || (t.includes('前') && /\d+/.test(t)) || t.includes('排行') || t.includes('第一名') || t.includes('首位')) return 'topn';
   // 明细查询 - 增强识别：有哪些/哪些/找/列出/筛选/过滤/明细/详情/具体/显示/查看(无统计词)
   const detailKeywords = ['明细', '详情', '列出', '有哪些', '有什么', '哪些是', '哪些在', '查找', '找出', '搜一下', '搜索', '筛选', '过滤', '具体订单', '具体记录', '具体数据', '显示.*订单', '显示.*记录'];
   for (const kw of detailKeywords) {
@@ -2795,6 +2899,12 @@ function detectFlow(text) {
       (t.includes('订单') || t.includes('记录') || t.includes('数据')) &&
       !t.includes('统计') && !t.includes('按') && !t.includes('趋势') &&
       !t.includes('分布') && !t.includes('汇总') && !t.includes('合计')) return 'detail';
+  // 指标名词结尾（退款订单的销售金额 / 已完成订单的金额）且无日期/明细语境 → 聚合统计（query）
+  // 避免被下方的“过滤词+订单主语→明细”规则抢先把聚合问句误路由成 detail
+  if (/(?:金额|数量|利润|单价|成本|销量|销售额|营业额)s*(?:是多少|有多少|为多少|共多少)?s*$/.test(t.trim())
+      && !/明细|详情|列出|有哪些|哪些|显示|查看|查询/.test(t)
+      && !/趋势|走势|季度|月份|年度|每月|每日|按日|按月|日期|时间|今年|去年|分布/.test(t)) return 'query';
+
   // 包含条件过滤词（未完成/已完成/已取消等状态词）且有"订单/记录"主语的，优先明细查询
   const filterWords = /未完成|未付款|未发货|未支付|已完成|已取消|已发货|已付款|已支付|处理中|待付款|待发货|待处理|待审核|已审核|成功|失败|退款|退货/i;
   const hasFilterWord = filterWords.test(t);
@@ -2802,6 +2912,8 @@ function detectFlow(text) {
   const hasAggregateWord = /统计|按|分布|趋势|汇总|合计|总数|有多少|多少(?:个|笔|条|单)?|几(?:个|笔|条|单)|数量.*按|多少.*按|各.*(?:订单|记录|用户|客户|商品|统计|分布|数量|金额)/i.test(t);
   // 如果有过滤词+实体词，且不是明确的聚合查询，则走明细
   if (hasFilterWord && hasEntityWord && !hasAggregateWord) return 'detail';
+  // 日期范围 + 明细类词 → 明细查询（如"2026年9月的异常记录""某月的数据"）
+  if (/\d{4}年|\d{1,2}月\d{1,2}日|年\s*\d{1,2}\s*月|月\s*\d{1,2}\s*日/.test(t) && /(明细|记录|数据|行|清单|详情|最早|最新|订单|单据)/.test(t)) return 'detail';
   // 趋势/时序分析（包含日期/时间相关词）- 只保留真正的日期/时间关键词
   const dateKeywords = ['趋势', '走势', '每日', '每天', '月度',
     '按日', '按月', '时间分布', '同比', '环比', '日期', '时间', '订单日期', '下单日期',
@@ -2809,12 +2921,24 @@ function detectFlow(text) {
     '日期分布', '星期', '月份', '年份', '季度',
     '周期'];
   for (const kw of dateKeywords) {
-    if (t.includes(kw)) return 'insight';
+    if (t.includes(kw)) {
+      // 含"记录/明细/详情"等时，用户要的是某条数据而非趋势
+      if (/记录|明细|详情|清单|行/.test(t)) return 'detail';
+      return 'insight';
+    }
   }
+  // 纯计数问句：「有多少笔订单 / 订单总数 / 有多少条记录」→ 分组计数
+  if (/(?:有多少|多少|几)\s*(?:笔|个|条|单)?\s*(?:订单|记录|数据|行)/i.test(t) && !/明细|详情|列出|有哪些|趋势/.test(t)) return 'query';
+  // 去重计数：「有多少个不同X / 几种X」→ 查询
+  if (/(?:有多少|多少|几)\s*(?:个|种|些)?\s*(?:不同|各类|各种)\s*[\u4e00-\u9fa5]{2,6}/.test(t)) return 'query';
+  // 「X的订单/记录/数据」结尾且无聚合词 → 明细（如「华东的订单」「金卡用户的订单」）
+  if (/(?:订单|记录|数据)\s*$/.test(t.trim()) && !/统计|按|各|多少|趋势|分布|汇总|合计|平均/.test(t)) return 'detail';
+  // 「维度+指标」问句（如「服饰品类的销售金额」）→ 分组统计
+  if (/(金额|数量|利润|成本|单价)/.test(t) && !/明细|详情|列出|查看|查询|有哪些|有什么|哪些|订单|记录/.test(t)) return 'query';
   // 如果查询包含已上传/演示表的字段名，则不返回 unknown，而是根据查询意图选择合适的流程
   if (textContainsFieldKeyword(text)) {
-    // 包含聚合/分组关键词 → 走 query（分组统计）
-    if (/统计|汇总|合计|总计|平均|按|各|分布|占比|多少|有几个|有几条|总数|用户数|订单数|记录数|条数|笔数|个数/i.test(t)) return 'query';
+    // 包含聚合/分组关键词 → 走 query（分组统计）；数量/次数 视为计数类聚合
+    if (/统计|汇总|合计|总计|平均|按|各|分布|占比|多少|有几个|有几条|总数|用户数|订单数|记录数|条数|笔数|个数|数量|次数/i.test(t)) return 'query';
     // 包含排名关键词 → 走 topn
     if (/排名|排行|最高|最低|最好|最差|top|前\d/i.test(t)) return 'topn';
     // 包含明细/详情/列出/查看等关键词 → 走 detail
@@ -2825,8 +2949,32 @@ function detectFlow(text) {
     // 较长的查询默认走明细
     return 'detail';
   }
+  // 查询中出现了已上传表的维度取值（如「新客」「金卡」）→ 按数据查询处理
+  if (queryMentionsDimValue(text)) return 'query';
   // 默认：无法识别
   return 'unknown';
+}
+
+// P0-2 4.1 / 4.2: 无法理解时，给出当前表的可用字段清单 + 基于本表的示例问题
+function buildUnknownHelp(t) {
+  if (!t || !t.fields) return '我目前仅支持数据分析相关的提问，请尝试用数据查询的方式提问。';
+  const fields = t.fields || [];
+  const dims = fields.filter(f => f.role === 'dimension' || f.role === 'category' || f.type === 'text' || f.type === 'category').map(f => f.desc || f.name).filter(Boolean).slice(0, 6);
+  const mets = fields.filter(f => f.role === 'metric' || f.type === 'number').map(f => f.desc || f.name).filter(Boolean).slice(0, 3);
+  const dimText = dims[0] || '维度';
+  const metText = mets[0] || '指标';
+  const fieldLine = dims.length ? '当前表可用的分析维度：' + dims.join('、') + '。' : '';
+  const metricLine = mets.length ? '可统计指标：' + mets.join('、') + '。' : '';
+  const examples = [
+    '各' + dimText + '的' + metText + '统计',
+    '按' + dimText + '分组排名 Top5',
+    metText + '最高的记录明细'
+  ];
+  return '我目前仅支持数据分析相关的提问。<br><br>' +
+    (fieldLine ? '<div style="font-size:13px;color:#334155;margin-bottom:6px;">' + fieldLine + '</div>' : '') +
+    (metricLine ? '<div style="font-size:13px;color:#334155;margin-bottom:10px;">' + metricLine + '</div>' : '') +
+    '<div style="font-size:13px;color:#0f172a;font-weight:500;margin-bottom:6px;">你可以试试这样问：</div>' +
+    '<div style="font-size:13px;color:#2563eb;line-height:2;">· ' + examples.join('<br>· ') + '</div>';
 }
 
 // Check if text is primarily about date/time analysis
@@ -2858,7 +3006,7 @@ function parseWhereConditions(queryText, targetTable) {
     const vals = new Set();
     for (const row of dataRows) {
       const v = row[field.name];
-      if (v != null && v !== '') vals.add(String(v));
+      if (v != null && v !== '') vals.add(String(v).trim());
     }
     return [...vals];
   };
@@ -2883,6 +3031,24 @@ function parseWhereConditions(queryText, targetTable) {
     }
     return bestField;
   };
+
+  // ===== 0.5 Primary key value match (e.g. "订单ID为O0001的订单") =====
+  // PK fields are excluded from dimension value matching, so match them explicitly here.
+  for (const f of fields) {
+    if (usedFields.has(f.name)) continue;
+    if (!(f.pk || f.role === 'pk' || f.role === 'id')) continue;
+    const vals = getFieldValues(f).filter(v => v.length >= 4);
+    const hit = vals.find(v => t.includes(v.toLowerCase()));
+    if (hit) {
+      conditions.push({
+        field: f, op: '=', value: hit,
+        sql: `${f.name} = '${hit.replace(/'/g, "''")}'`,
+        description: `${f.desc || f.name}=${hit}`
+      });
+      usedFields.add(f.name);
+      break;
+    }
+  }
 
   // ===== 1. Status/state filter parsing =====
   // Status keyword mapping: keyword -> {positive: [values to include], negative: [values to exclude]}
@@ -2960,14 +3126,137 @@ function parseWhereConditions(queryText, targetTable) {
     }
   }
 
+  // ===== 1.5 Boolean field filters (是否X / 新客 / 老客 / 非新客) =====
+  const BOOL_TRUTHY = /^(是|true|1|y|yes|t|对|有|支持|有效|正常|新客|新用户|新客户|新会员|男|线上|内|自营)$/i;
+  const BOOL_FALSY = /^(否|false|0|n|no|f|错|无|不支持|无效|异常|老客|老用户|老客户|老会员|女|线下|外|非自营)$/i;
+  for (const bf of fields) {
+    if (bf.role !== 'boolean' || usedFields.has(bf.name)) continue;
+    const values = getFieldValues(bf);
+    if (values.length === 0 || values.length > 8) continue;
+    const label = (bf.desc || bf.alias || bf.name || '');
+    const truthyRep = values.find(v => BOOL_TRUTHY.test(v));
+    const falsyRep = values.find(v => BOOL_FALSY.test(v));
+    const subjM = label.match(/是否\s*([\u4e00-\u9fa5A-Za-z_]{1,8})/) || label.match(/^is[_\s]*([a-z]{1,12})$/i);
+    const subject = subjM ? subjM[1] : null;
+    const findWord = (word) => {
+      const idx = t.indexOf(String(word).toLowerCase());
+      if (idx === -1) return null;
+      const before = t.substring(Math.max(0, idx - 3), idx);
+      return { neg: /(非|不是|未|没|无)\s*$/.test(before) };
+    };
+    let intent = null; // 'Y' | 'N'
+    if (subject) {
+      const hit = findWord(subject);
+      if (hit) intent = hit.neg ? 'N' : 'Y';
+      if (!intent) {
+        const antonym = { '新客':'老客','新用户':'老用户','新客户':'老客户','新会员':'老会员','有效':'无效','正常':'异常' }[subject];
+        if (antonym) { const h2 = findWord(antonym); if (h2) intent = h2.neg ? 'Y' : 'N'; }
+      }
+    }
+    if (!intent) {
+      const mm = t.match(/是否\s*([\u4e00-\u9fa5A-Za-z_]{1,8})/);
+      if (mm && (label.includes(mm[1]) || (bf.name || '').toLowerCase().includes(mm[1].toLowerCase()))) {
+        const before = t.substring(Math.max(0, (mm.index || 0) - 3), mm.index || 0);
+        intent = /(非|不|没|未)\s*$/.test(before) ? 'N' : 'Y';
+      }
+    }
+    if (!intent) {
+      for (const v of values) {
+        if (v.length < 2) continue;
+        const hit = findWord(v);
+        if (hit) {
+          // 标签遮蔽：该取值若属于另一字段的标签且标签整体出现在问句中
+          // （如问句提「是否新客」，则「新客」指的是该字段，不应再被其他列直接命中）
+          const shadowed = fields.some(f2 => f2 !== bf && (f2.desc || f2.alias || f2.name || '').includes(v)
+            && t.includes(String(f2.desc || f2.alias || f2.name || '').toLowerCase()));
+          if (shadowed) continue;
+          intent = BOOL_FALSY.test(v) ? (hit.neg ? 'Y' : 'N') : (hit.neg ? 'N' : 'Y');
+          break;
+        }
+      }
+    }
+    if (!intent) continue;
+    // 分组语境（各/按/分别/每 + 字段或主词）→ 用户要的是分组统计，不生成过滤条件
+    const escRe = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const groupCtx = (subject && new RegExp('(?:各|按|分别|每)\s*(?:是否)?' + escRe(subject)).test(t))
+      || new RegExp('(?:各|按|分别)\s*' + escRe(label)).test(t);
+    if (groupCtx) continue;
+    let rep = intent === 'Y' ? truthyRep : falsyRep;
+    if (!rep && subject && values.includes(subject)) rep = subject;
+    if (!rep && values.length === 2) rep = intent === 'Y' ? values.find(v => v !== falsyRep) : values.find(v => v !== truthyRep);
+    if (!rep) continue;
+    conditions.push({
+      field: bf, op: '=', value: rep,
+      sql: bf.name + " = '" + String(rep).replace(/'/g, "''") + "'",
+      description: label + '=' + rep
+    });
+    usedFields.add(bf.name);
+  }
+
   // ===== 2. Dimension value filters (city/channel/category/etc.) =====
   // Look for dimension values mentioned in the query (e.g., "武汉的订单", "线上渠道")
   const dimensionFields = fields.filter(f => {
     if (f.pk || f.role === 'id' || usedFields.has(f.name)) return false;
+    // 布尔列由 1.5 布尔段独家处理（否则 2 字值如「新客」会穿透到通用维度匹配，把分组问句误过滤）
+    if (f.role === 'boolean') return false;
     if (/decimal|int|float|bigint|double|number|numeric/i.test(f.type)) return false;
     if (/date|time|日期|时间/i.test(f.name) || /日期|时间/.test(f.desc || '')) return false;
     return true;
   });
+
+  // ===== 2.15 模糊匹配 LIKE（包含/含有/带...字样/有...字 → LIKE '%x%'；开头/结尾 → LIKE 'x%'/'%x'）=====
+  {
+    const isTextish = (f) => f && f.role !== 'boolean' && f.role !== 'metric' && !/decimal|int|float|bigint|double|number|numeric/i.test(f.type || '') && !/date|time|日期|时间/i.test((f.name || '') + ' ' + (f.desc || ''));
+    const resolveTextField = () => {
+      // 1) 问句点名了某文本字段（标签/同义词）—— 在所有字段里找（含被误判为 id 的自由文本列）
+      for (const f of fields) {
+        if (!isTextish(f)) continue;
+        const lbl = f.desc || f.alias || f.name || '';
+        if (lbl.length >= 2 && t.includes(lbl)) return f;
+        const syns = getFieldSynonyms(f.desc || f.alias || f.name || '') || [];
+        if (syns.some(sy => sy && sy.length >= 2 && t.includes(sy))) return f;
+      }
+      // 2) 唯一文本字段
+      const textFs = fields.filter(isTextish);
+      if (textFs.length === 1) return textFs[0];
+      // 3) 多个文本字段时，优先唯一的自由文本（高基数）字段
+      const hiCard = textFs.filter(f => getFieldValues(f).length > 15);
+      if (hiCard.length === 1) return hiCard[0];
+      return null;
+    };
+    const addLike = (mode, rawVal) => {
+      let val = String(rawVal || '')
+        .replace(/^[\u4e00-\u9fa5A-Za-z]*(以|用|按|照|带|含)/, '')
+        .replace(/(?:字样|的字|的|订单|记录|商品|产品|明细|数据|信息|资料|内容|字)+$/, '')
+        .trim();
+      if (!val) return;
+      const f = resolveTextField();
+      if (!f) return;
+      if (usedFields.has(f.name) || conditions.some(c => c.field.name === f.name)) return;
+      const v = val.replace(/'/g, "''");
+      const sql = mode === 'prefix' ? f.name + " LIKE '" + v + "%'" : mode === 'suffix' ? f.name + " LIKE '%" + v + "'" : f.name + " LIKE '%" + v + "%'";
+      const descLike = mode === 'prefix' ? v + '%' : mode === 'suffix' ? '%' + v : '%' + v + '%';
+      conditions.push({ field: f, op: 'like', value: val, mode: mode, sql: sql, description: (f.desc || f.name) + ' LIKE ' + descLike });
+      usedFields.add(f.name);
+    };
+    let handled = false;
+    const cm = t.match(/(?:包含|含有|内含|包含有|带有)\s*[「『"'“']?\s*([A-Za-z0-9\u4e00-\u9fa5]{1,12}?)\s*(?:字样|的字|字)?[」』"'”']?(?=\s|的|$|，|。|、|订单|记录|商品|产品|明细|数据)/)
+           || t.match(/([A-Za-z0-9\u4e00-\u9fa5]{1,12})\s*字样/)
+           || t.match(/有\s*[「『"'“']?([A-Za-z0-9\u4e00-\u9fa5]{1,12})[」』"'”']?\s*字/);
+    if (cm && cm[1]) { addLike('contains', cm[1]); handled = true; }
+    if (!handled) {
+      const pm = t.match(/开头(?:是|为)\s*[「『"'“']?([A-Za-z0-9\u4e00-\u9fa5]{1,12})/)
+              || t.match(/以\s*([A-Za-z0-9\u4e00-\u9fa5]{1,12})\s*开头/)
+              || t.match(/([A-Za-z0-9\u4e00-\u9fa5]{1,12}?)\s*开头/);
+      if (pm && pm[1]) { addLike('prefix', pm[1]); handled = true; }
+    }
+    if (!handled) {
+      const sm = t.match(/结尾(?:是|为)\s*[「『"'“']?([A-Za-z0-9\u4e00-\u9fa5]{1,12})/)
+              || t.match(/以\s*([A-Za-z0-9\u4e00-\u9fa5]{1,12})\s*结尾/)
+              || t.match(/([A-Za-z0-9\u4e00-\u9fa5]{1,12}?)\s*结尾/);
+      if (sm && sm[1]) { addLike('suffix', sm[1]); }
+    }
+  }
 
   // Common short values that match across multiple fields — only treat as filter
   // when the user explicitly mentions the field name in the query.
@@ -2977,10 +3266,48 @@ function parseWhereConditions(queryText, targetTable) {
     '支持(需提示)','部分支持','需配置'
   ]);
 
+  // Pre-compute value ownership: a 2-char value is only safe to auto-match when it
+  // belongs to exactly one dimension field (avoids ambiguous short values like 中/行).
+  const valueOwners = new Map();
+  for (const df of dimensionFields) {
+    for (const v of getFieldValues(df)) {
+      if (v.length < 2) continue;
+      const k = v.toLowerCase();
+      if (!valueOwners.has(k)) valueOwners.set(k, new Set());
+      valueOwners.get(k).add(df.name);
+    }
+  }
+
   for (const df of dimensionFields) {
     const values = getFieldValues(df);
-    // Skip fields with too many unique values (likely free text, not a dimension)
-    if (values.length > 30) continue;
+    // High-cardinality fields (likely free text like 商品名称): allow keyword
+    // substring matching — a 2+ char Chinese keyword from the query that appears
+    // inside a value counts as a filter (e.g. "含苹果" → 商品名称 = 苹果15).
+    if (values.length > 30) {
+      const hit = values.find(v => {
+        const vl = v.toLowerCase();
+        if (vl.length < 2) return false;
+        if (t.includes(vl)) return true;
+        for (let len = Math.min(4, t.length); len >= 2; len--) {
+          for (let i = 0; i + len <= t.length; i++) {
+            const sub = t.substring(i, i + len);
+            if (!/^[\u4e00-\u9fa5]+$/.test(sub)) continue;
+            if (/^(订单|明细|查询|统计|多少|哪些|有哪|些什|数据|记录|帮我|我想|查看|显示|列出|的订)/.test(sub)) continue;
+            if (vl.includes(sub)) return true;
+          }
+        }
+        return false;
+      });
+      if (hit && !usedFields.has(df.name)) {
+        conditions.push({
+          field: df, op: '=', value: hit,
+          sql: `${df.name} = '${hit.replace(/'/g, "''")}'`,
+          description: `${df.desc || df.name}=${hit}`
+        });
+        usedFields.add(df.name);
+      }
+      continue;
+    }
 
     // Check if this field is explicitly mentioned in the query by name/alias/synonyms
     const fieldLabel = (df.desc || df.alias || df.name || '').toLowerCase();
@@ -2995,32 +3322,80 @@ function parseWhereConditions(queryText, targetTable) {
       }
     }
 
+    // 搜集问句中出现的该字段全部取值（支持「A和B」「A、B」「A与B」同维度多值合并）
+    const valHits = [];
     for (const val of values) {
       // Skip very short values that could be false positives
       if (val.length < 2) continue;
       // If the field is NOT explicitly mentioned in the query, skip common short
-      // values (e.g. "支持") that would match many unrelated fields. Only match
-      // values that are specific enough (length >= 3 and not in COMMON_DIM_VALUES).
+      // values (e.g. "support") that would match many unrelated fields.
       if (!isFieldMentioned) {
-        if (val.length < 3) continue;
         if (COMMON_DIM_VALUES.has(val.toLowerCase())) continue;
+        if (val.length < 3) {
+          // 2-char values (金卡/华东/华南): only safe when unambiguous — the value
+          // must belong to exactly one dimension field in the table.
+          const owners = valueOwners.get(val.toLowerCase());
+          if (!owners || owners.size !== 1 || !owners.has(df.name)) continue;
+        }
+        // Unmentioned field: skip status-style values (已/未/待开头, ≤4 chars).
+        // Status filtering is handled by the status mapping above; matching these
+        // values again here causes false positives (e.g. a 备注 column containing
+        // the literal value 「未完成」).
+        if (/^(已|未|待)/.test(val) && val.length <= 4) continue;
       }
       // Check if this value appears in the query text
-      if (t.includes(val.toLowerCase())) {
-        // Make sure it's not part of a status pattern we already handled
-        const alreadyHandled = conditions.some(c => c.field.name === df.name);
-        if (!alreadyHandled) {
-          conditions.push({
-            field: df,
-            op: '=',
-            value: val,
-            sql: `${df.name} = '${val.replace(/'/g, "''")}'`,
-            description: `${df.desc || df.name}=${val}`
-          });
-          usedFields.add(df.name);
-          break; // One value per dimension field
-        }
+      const vIdx = t.indexOf(val.toLowerCase());
+      if (vIdx === -1) continue;
+      // Negation prefix right before the value (非/除了/不包括/以外/不是/不含/而非) → !=
+      const before = vIdx > 0 ? t.substring(Math.max(0, vIdx - 4), vIdx) : '';
+      const isNeg = /(非|除了|不包括|以外|不是|不含|而非)\s*$/.test(before);
+      valHits.push({ val, isNeg });
+    }
+    // 长值优先：若某取值是另一取值的子串（如「会员」⊂「黄金会员」），只保留长值
+    const valHitsLong = valHits.filter(h => !valHits.some(o => o !== h && o.val.length > h.val.length && o.val.includes(h.val)));
+    if (valHitsLong.length > 0 && !usedFields.has(df.name) && !conditions.some(c => c.field.name === df.name)) {
+      const posVals = valHitsLong.filter(h => !h.isNeg).map(h => h.val);
+      const negVals = valHitsLong.filter(h => h.isNeg).map(h => h.val);
+      if (posVals.length > 1) {
+        const valStr = posVals.map(v => `'${v.replace(/'/g, "''")}'`).join(', ');
+        conditions.push({
+          field: df, op: 'IN', value: posVals,
+          sql: `${df.name} IN (${valStr})`,
+          description: `${df.desc || df.name} IN (${posVals.join('/')})`
+        });
+        usedFields.add(df.name);
+      } else if (posVals.length === 1) {
+        const val = posVals[0];
+        conditions.push({
+          field: df, op: '=', value: val,
+          sql: `${df.name} = '${val.replace(/'/g, "''")}'`,
+          description: `${df.desc || df.name}=${val}`
+        });
+        usedFields.add(df.name);
       }
+      for (const nv of negVals) {
+        conditions.push({
+          field: df, op: '!=', value: nv,
+          sql: `${df.name} != '${nv.replace(/'/g, "''")}'`,
+          description: `${df.desc || df.name}!=${nv}`
+        });
+        usedFields.add(df.name);
+      }
+    }
+  }
+
+  // ===== 2.5 Null-value filters (X为空 / X未填写 → IS NULL) =====
+  for (const df of dimensionFields) {
+    if (usedFields.has(df.name)) continue;
+    const label = (df.desc || df.alias || df.name || '');
+    if (label.length < 2) continue;
+    const escL = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    if (new RegExp(escL + '\\s*(?:为|是|等于)?\\s*(?:空|空值|未填写|没填|null)', 'i').test(t)) {
+      conditions.push({ field: df, op: 'is_null', value: null, sql: `${df.name} IS NULL`, description: `${label}为空` });
+      usedFields.add(df.name);
+    } else if (/不为空|非空|已填写/.test(t) && new RegExp(escL + '\\s*(?:不)?是?\\s*(?:非)?空', 'i').test(t)) {
+      conditions.push({ field: df, op: 'is_not_null', value: null, sql: `${df.name} IS NOT NULL`, description: `${label}不为空` });
+      usedFields.add(df.name);
     }
   }
 
@@ -3041,21 +3416,45 @@ function parseWhereConditions(queryText, targetTable) {
   for (const nc of numComparisons) {
     const match = t.match(nc.pattern);
     if (match) {
-      const numVal = parseFloat(match[1].replace(/,/g, ''));
-      if (!isNaN(numVal)) {
-        // Find which metric field this applies to
+        const numVal = parseFloat(match[1].replace(/,/g, ''));
+        // Percentage: if a % sign follows the number, normalize to fraction
+        // (consistent with parseNumeric, which divides percentages by 100)
+        const afterNum = t.substring(match.index + match[0].length, match.index + match[0].length + 1);
+        const finalVal = afterNum === '%' ? numVal / 100 : numVal;
+      if (!isNaN(finalVal)) {
+        // Find which metric field this applies to.
+        // Priority: explicit field label > synonyms > generic-word semantics > first numeric field.
+        const beforeNum = t.substring(0, match.index).slice(-20);
         let targetNumField = null;
-        // Check if a metric is mentioned nearby
+        // 1) Explicit field label (desc/alias/name) appears before the number
         for (const nf of numericFields) {
           const label = (nf.desc || nf.alias || nf.name || '').toLowerCase();
-          // Look for field name/synonym before the number
-          const beforeNum = t.substring(0, match.index).slice(-20);
-          if (label.length > 0 && (beforeNum.includes(label) || new RegExp(`(金额|数量|销量|价格|利润|成本|额|量|数)`).test(beforeNum))) {
-            targetNumField = nf;
-            break;
+          if (label.length >= 2 && beforeNum.includes(label)) { targetNumField = nf; break; }
+        }
+        // 2) Synonym match (e.g. 金额 → 销售金额 via FIELD_SYNONYMS)
+        if (!targetNumField) {
+          for (const nf of numericFields) {
+            const syns = getFieldSynonyms(nf.desc || nf.alias || nf.name || '');
+            if (syns.some(sy => sy && sy.length >= 2 && beforeNum.includes(sy.toLowerCase()))) { targetNumField = nf; break; }
           }
         }
-        // If no specific field found, use primary metric (first numeric field)
+        // 3) Generic business word → semantically matching field
+        if (!targetNumField) {
+          const GENERIC_SEMANTIC = [
+            [/金额|销售额|营收|收入|gmv|总额|成交额|营业额/, /金额|额/],
+            [/利润|毛利|收益|盈利|赚钱/, /利润/],
+            [/成本|进价|花费|支出/, /成本/],
+            [/单价|价格|售价|均价|价钱/, /单价|价格/],
+            [/数量|销量|件数|总量/, /数量/],
+          ];
+          for (const [wordRe, fieldRe] of GENERIC_SEMANTIC) {
+            if (wordRe.test(beforeNum)) {
+              const nf = numericFields.find(f => fieldRe.test(f.desc || f.alias || f.name || ''));
+              if (nf) { targetNumField = nf; break; }
+            }
+          }
+        }
+        // 4) Fallback: first numeric field
         if (!targetNumField && numericFields.length > 0) {
           targetNumField = numericFields[0];
         }
@@ -3063,13 +3462,93 @@ function parseWhereConditions(queryText, targetTable) {
           conditions.push({
             field: targetNumField,
             op: nc.op,
-            value: numVal,
-            sql: `${targetNumField.name} ${nc.op} ${numVal}`,
-            description: `${targetNumField.desc || targetNumField.name}${nc.op}${numVal}`
+            value: finalVal,
+            sql: `${targetNumField.name} ${nc.op} ${finalVal}`,
+            description: `${targetNumField.desc || targetNumField.name}${nc.op}${finalVal}`
           });
           usedFields.add(targetNumField.name);
         }
       }
+    }
+  }
+
+  // ===== 3.5 Numeric BETWEEN (金额在100到500之间) =====
+  const betweenMatch = t.match(/([\u4e00-\u9fa5A-Za-z]{2,8}?)\s*(?:在|介于)?\s*(\d+(?:\.\d+)?)\s*(?:到|至|~|—|－|-)\s*(\d+(?:\.\d+)?)\s*(?:之)?间/);
+  if (betweenMatch && numericFields.length > 0) {
+    const w = betweenMatch[1];
+    let bField = null;
+    for (const nf of numericFields) {
+      const label = (nf.desc || nf.alias || nf.name || '').toLowerCase();
+      if (label.includes(w.toLowerCase())) { bField = nf; break; }
+    }
+    if (!bField) {
+      for (const nf of numericFields) {
+        const syns = getFieldSynonyms(nf.desc || nf.alias || nf.name || '');
+        if (syns.some(sy => sy && sy.length >= 2 && w.includes(sy))) { bField = nf; break; }
+      }
+    }
+    if (bField && !usedFields.has(bField.name)) {
+      const v1 = parseFloat(betweenMatch[2]), v2 = parseFloat(betweenMatch[3]);
+      conditions.push({
+        field: bField, op: 'between', value: [Math.min(v1, v2), Math.max(v1, v2)],
+        sql: `${bField.name} BETWEEN ${Math.min(v1, v2)} AND ${Math.max(v1, v2)}`,
+        description: `${bField.desc || bField.name}在${Math.min(v1, v2)}到${Math.max(v1, v2)}之间`
+      });
+      usedFields.add(bField.name);
+    }
+  }
+
+  // ===== 3.55 负值/亏损表达（为负数/负数/为负/负值/亏损/小于零/低于零 → 字段<0） =====
+  const negTriggers = /负数|负值|为负|为负数|小于零|低于零|是负的|亏损/;
+  if (negTriggers.test(t)) {
+    let negField = null;
+    // 亏损 语义上指向利润字段
+    if (/亏损/.test(t)) negField = numericFields.find(f => /利润|盈利|收益|毛利/.test(f.desc || f.alias || f.name || ''));
+    if (!negField) {
+      for (const nf of numericFields) {
+        const label = (nf.desc || nf.alias || nf.name || '').toLowerCase();
+        const syns = getFieldSynonyms(nf.desc || nf.alias || nf.name || '') || [];
+        if (label.length >= 2 && t.includes(label)) { negField = nf; break; }
+        if (syns.some(sy => sy && sy.length >= 2 && t.includes(sy.toLowerCase()))) { negField = nf; break; }
+      }
+    }
+    if (!negField && numericFields.length > 0) negField = numericFields[0];
+    if (negField && !usedFields.has(negField.name)) {
+      conditions.push({ field: negField, op: '<', value: 0, sql: `${negField.name} < 0`, description: `${negField.desc || negField.name}<0（负值）` });
+      usedFields.add(negField.name);
+    }
+  }
+
+  // ===== 3.6 Field-to-field comparison (利润大于成本) =====
+  const fieldCmp = t.match(/(金额|数量|销量|利润|成本|单价|价格)\s*(大于|高于|超过|多于|小于|低于|少于)\s*(金额|数量|销量|利润|成本|单价|价格)/);
+  if (fieldCmp) {
+    const pickField = (w) => {
+      const re = new RegExp(w === '销量' ? '数量' : w === '价格' ? '单价' : w);
+      return numericFields.find(nf => re.test(nf.desc || nf.alias || nf.name || ''));
+    };
+    const fA = pickField(fieldCmp[1]), fB = pickField(fieldCmp[3]);
+    if (fA && fB && fA.name !== fB.name && !usedFields.has(fA.name)) {
+      const isGt = /大于|高于|超过|多于/.test(fieldCmp[2]);
+      conditions.push({
+        field: fA, op: isGt ? 'gtfield' : 'ltfield', value: fB.name,
+        sql: `${fA.name} ${isGt ? '>' : '<'} ${fB.name}`,
+        description: `${fA.desc || fA.name}${isGt ? '>' : '<'}${fB.desc || fB.name}`
+      });
+      usedFields.add(fA.name);
+    }
+  }
+
+  // ===== 3.7 Business synonym bridge: 退货/退款单 → 负金额 =====
+  // 表内已有布尔型「是否退款/退货」列且已生成对应条件时，以布尔条件为准：
+  // 退款单金额可能正负混合（本表 32笔退款中 12笔为正），不能一律桥接成负金额
+  const hasRefundBoolField = fields.some(f => f.role === 'boolean' && /退款|退货/.test((f.desc || f.alias || f.name || '')));
+  // 退款/退货词由布尔列负责（否则语句里没有对应词，如“冲正/负向单”，才回落到负金额桥接）
+  const refundWordCovered = /退款|退货/.test(t);
+  if (/退货|退款|冲正|负向单/.test(t) && (!hasRefundBoolField || !refundWordCovered)) {
+    const amtF = numericFields.find(f => /金额/.test(f.desc || f.alias || f.name || '')) || numericFields[0];
+    if (amtF && !usedFields.has(amtF.name)) {
+      conditions.push({ field: amtF, op: '<', value: 0, sql: `${amtF.name} < 0`, description: '退货单（金额<0）' });
+      usedFields.add(amtF.name);
     }
   }
 
@@ -3082,27 +3561,94 @@ function parseWhereConditions(queryText, targetTable) {
   });
 
   if (dateFields.length > 0) {
-    const dateField = dateFields[0];
+    let dateField = dateFields[0];
+    // 多日期列：若问句明确提到某日期列的特征词（发货/创建/支付/注册/更新/下单），优先选该列
+    if (dateFields.length > 1) {
+      for (const f of dateFields) {
+        const lbl = (f.header || f.desc || '') + (f.name || '');
+        const tokens = (lbl.match(/[\u4e00-\u9fa5]+/g) || []).filter(tok => !/^(日期|时间|下单)$/.test(tok));
+        if (tokens.some(tok => t.indexOf(tok) >= 0)) { dateField = f; break; }
+      }
+    }
     let dateCondition = null;
 
-    if (/今天|今日/.test(t)) {
-      dateCondition = { sql: `DATE(${dateField.name}) = CURDATE()`, desc: '今天' };
-    } else if (/昨天|昨日/.test(t)) {
-      dateCondition = { sql: `DATE(${dateField.name}) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)`, desc: '昨天' };
-    } else if (/本周|这周/.test(t)) {
-      dateCondition = { sql: `YEARWEEK(${dateField.name}) = YEARWEEK(CURDATE())`, desc: '本周' };
-    } else if (/本月|这个月|当月/.test(t)) {
-      dateCondition = { sql: `YEAR(${dateField.name}) = YEAR(CURDATE()) AND MONTH(${dateField.name}) = MONTH(CURDATE())`, desc: '本月' };
-    } else if (/上周|上一周/.test(t)) {
-      dateCondition = { sql: `YEARWEEK(${dateField.name}) = YEARWEEK(DATE_SUB(CURDATE(), INTERVAL 1 WEEK))`, desc: '上周' };
-    } else if (/上月|上个月/.test(t)) {
-      dateCondition = { sql: `${dateField.name} >= DATE_SUB(DATE_SUB(CURDATE(), INTERVAL DAYOFMONTH(CURDATE())-1 DAY), INTERVAL 1 MONTH) AND ${dateField.name} < DATE_SUB(CURDATE(), INTERVAL DAYOFMONTH(CURDATE())-1 DAY)`, desc: '上月' };
-    } else {
-      // 最近N天
-      const recentMatch = t.match(/(?:最近|近|过去)\s*(\d+)\s*(?:天|日)/);
-      if (recentMatch) {
-        const days = parseInt(recentMatch[1]);
-        dateCondition = { sql: `${dateField.name} >= DATE_SUB(CURDATE(), INTERVAL ${days} DAY)`, desc: `最近${days}天` };
+    // ── Absolute date patterns (checked BEFORE relative words) ──
+    const ymdFull = t.match(/(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*[日号]?/);
+    const monthRange = t.match(/(\d{1,2})\s*月\s*(?:到|至|~|—|－|-)\s*(\d{1,2})\s*月/);
+    const ymMatch = t.match(/(\d{4})\s*年\s*(\d{1,2})\s*月/);
+    const isoDay = t.match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+    const isoYm = t.match(/(\d{4})[-/](\d{1,2})(?!\d|[-/]\d)/);
+    const quarter = t.match(/第?\s*([一二三四1-4])\s*季度/);
+    const yearOnly = t.match(/(\d{4})\s*年/);
+    const bareMonth = t.match(/(\d{1,2})\s*月(?:份)?/);
+    const pad2 = v => String(v).padStart(2, '0');
+    const qMap = { '一': 1, '二': 2, '三': 3, '四': 4 };
+
+    if (ymdFull) {
+      const [, y, mo, d] = ymdFull;
+      dateCondition = { sql: `DATE(${dateField.name}) = '${y}-${pad2(mo)}-${pad2(d)}'`, desc: `${y}年${mo}月${d}日`, range: { from: new Date(+y, +mo - 1, +d), to: new Date(+y, +mo - 1, +d, 23, 59, 59, 999) } };
+    } else if (monthRange) {
+      const [, m1, m2] = monthRange;
+      const y = yearOnly ? +yearOnly[1] : null;
+      const lo = Math.min(+m1, +m2), hi = Math.max(+m1, +m2);
+      dateCondition = { sql: y ? `YEAR(${dateField.name}) = ${y} AND MONTH(${dateField.name}) BETWEEN ${lo} AND ${hi}` : `MONTH(${dateField.name}) BETWEEN ${lo} AND ${hi}`, desc: `${m1}月到${m2}月`, range: { months: [lo, hi], year: y } };
+    } else if (ymMatch) {
+      const [, y, mo] = ymMatch;
+      dateCondition = { sql: `YEAR(${dateField.name}) = ${y} AND MONTH(${dateField.name}) = ${mo}`, desc: `${y}年${mo}月`, range: { from: new Date(+y, +mo - 1, 1), to: new Date(+y, +mo, 0, 23, 59, 59, 999) } };
+    } else if (isoDay) {
+      const [, y, mo, d] = isoDay;
+      dateCondition = { sql: `DATE(${dateField.name}) = '${y}-${pad2(mo)}-${pad2(d)}'`, desc: `${y}年${mo}月${d}日`, range: { from: new Date(+y, +mo - 1, +d), to: new Date(+y, +mo - 1, +d, 23, 59, 59, 999) } };
+    } else if (isoYm) {
+      const [, y, mo] = isoYm;
+      dateCondition = { sql: `YEAR(${dateField.name}) = ${y} AND MONTH(${dateField.name}) = ${mo}`, desc: `${y}年${mo}月`, range: { from: new Date(+y, +mo - 1, 1), to: new Date(+y, +mo, 0, 23, 59, 59, 999) } };
+    } else if (quarter) {
+      const q = qMap[quarter[1]] || parseInt(quarter[1]);
+      const y = yearOnly ? +yearOnly[1] : new Date().getFullYear();
+      const sm = (q - 1) * 3;
+      dateCondition = { sql: `YEAR(${dateField.name}) = ${y} AND MONTH(${dateField.name}) BETWEEN ${sm + 1} AND ${sm + 3}`, desc: `${y}年第${q}季度`, range: { from: new Date(y, sm, 1), to: new Date(y, sm + 3, 0, 23, 59, 59, 999) } };
+    } else if (yearOnly) {
+      const y = +yearOnly[1];
+      dateCondition = { sql: `YEAR(${dateField.name}) = ${y}`, desc: `${y}年`, range: { from: new Date(y, 0, 1), to: new Date(y, 11, 31, 23, 59, 59, 999) } };
+    } else if (bareMonth) {
+      const mo = +bareMonth[1];
+      if (mo >= 1 && mo <= 12) {
+        dateCondition = { sql: `MONTH(${dateField.name}) = ${mo}`, desc: `${mo}月`, range: { months: [mo] } };
+      }
+    }
+
+    // ── Relative date patterns (today / yesterday / this week / this month / last week / last month / last N days / this year) ──
+    if (!dateCondition) {
+      const now = new Date();
+      const dayStart = d => new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
+      const dayEnd = d => new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
+      if (/今年|本年|这一年内|年初以来/.test(t)) {
+        const y = now.getFullYear();
+        dateCondition = { sql: `YEAR(${dateField.name}) = ${y}`, desc: '今年', range: { from: new Date(y, 0, 1), to: new Date(y, 11, 31, 23, 59, 59, 999) } };
+      } else if (/今天|今日/.test(t)) {
+        dateCondition = { sql: `CAST(${dateField.name} AS DATE) = current_date`, desc: '今天', range: { from: dayStart(now), to: dayEnd(now) } };
+      } else if (/昨天|昨日/.test(t)) {
+        const y = new Date(now); y.setDate(y.getDate() - 1);
+        dateCondition = { sql: `CAST(${dateField.name} AS DATE) = (current_date - INTERVAL '1' DAY)`, desc: '昨天', range: { from: dayStart(y), to: dayEnd(y) } };
+      } else if (/本周|这周/.test(t)) {
+        const dow = (now.getDay() + 6) % 7;
+        const mon = new Date(now); mon.setDate(mon.getDate() - dow);
+        dateCondition = { sql: `date_trunc('week', ${dateField.name}) = date_trunc('week', current_date)`, desc: '本周', range: { from: dayStart(mon), to: dayEnd(new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6)) } };
+      } else if (/本月|这个月|当月/.test(t)) {
+        dateCondition = { sql: `YEAR(${dateField.name}) = YEAR(current_date) AND MONTH(${dateField.name}) = MONTH(current_date)`, desc: '本月', range: { from: new Date(now.getFullYear(), now.getMonth(), 1), to: new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999) } };
+      } else if (/上周|上一周/.test(t)) {
+        const dow = (now.getDay() + 6) % 7;
+        const mon = new Date(now); mon.setDate(mon.getDate() - dow - 7);
+        dateCondition = { sql: `date_trunc('week', ${dateField.name}) = date_trunc('week', (current_date - INTERVAL '1' WEEK))`, desc: '上周', range: { from: dayStart(mon), to: dayEnd(new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6)) } };
+      } else if (/上月|上个月/.test(t)) {
+        dateCondition = { sql: `strftime(${dateField.name}, '%Y-%m') = strftime((current_date - INTERVAL '1' MONTH), '%Y-%m')`, desc: '上月', range: { from: new Date(now.getFullYear(), now.getMonth() - 1, 1), to: new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999) } };
+      } else {
+        // 最近N天
+        const recentMatch = t.match(/(?:最近|近|过去)\s*(\d+)\s*(?:天|日)/);
+        if (recentMatch) {
+          const days = parseInt(recentMatch[1]);
+          const from = new Date(now); from.setDate(from.getDate() - (days - 1));
+          dateCondition = { sql: `${dateField.name} >= (current_date - INTERVAL '${days}' DAY)`, desc: `最近${days}天`, range: { from: dayStart(from), to: dayEnd(now) } };
+        }
       }
     }
 
@@ -3110,7 +3656,7 @@ function parseWhereConditions(queryText, targetTable) {
       conditions.push({
         field: dateField,
         op: 'date_range',
-        value: null,
+        value: dateCondition.range || null,
         sql: dateCondition.sql,
         description: dateCondition.desc
       });
@@ -3161,59 +3707,79 @@ function addMessage(role, content) {
 
 function findTableInQuery(text) {
   const names = Object.keys(tables);
-  // Check if there are uploaded tables - prioritize them
+  // Uploaded tables in insertion order — used for "第N个表 / 表N" positional references
   const uploadedTables = names.filter(n => tables[n].group === '上传数据');
   const hasUploaded = uploadedTables.length > 0;
+  const t = text.toLowerCase();
 
-  // Helper: give bonus score to uploaded tables
-  const getTableBonus = (t) => {
-    if (t.group === '上传数据') return 500; // Large bonus for uploaded tables
-    return 0;
-  };
-
-  // First pass: exact table name/alias match
-  for (const name of names) {
-    const t = tables[name];
-    if (text.includes(name) || (t.alias && text.includes(t.alias))) return t;
+  // ── 1) 序数 / 位置指代：第一个表 / 表1 / 第二张 / 另一个 / 刚上传的 ──
+  if (hasUploaded) {
+    let ordinalIdx = -1;
+    if (/(?:表\s*1\b|1\s*号表|第\s*一\s*(?:个|张|份)?\s*表|第一个表|第一张表)/.test(t)) ordinalIdx = 0;
+    else if (/(?:表\s*2\b|2\s*号表|第\s*二\s*(?:个|张|份)?\s*表|第二个表|第二张表)/.test(t)) ordinalIdx = 1;
+    else if (/(?:表\s*3\b|3\s*号表|第\s*三\s*(?:个|张|份)?\s*表|第三个表|第三张表)/.test(t)) ordinalIdx = 2;
+    if (ordinalIdx >= 0 && ordinalIdx < uploadedTables.length) {
+      return tables[uploadedTables[ordinalIdx]];
+    }
+    // "刚上传的 / 最新上传的 / 最后上传的 / 刚才上传的" → 最近一张
+    if (/(刚|刚刚|最新|最后|最近)\s*上传|刚才\s*上传|最后\s*上传/.test(t)) {
+      return tables[uploadedTables[uploadedTables.length - 1]];
+    }
+    // "另一个 / 另一张 / 另外的表 / 别的表" → 仅 2 张时取非最近那张（即第一张）
+    if (uploadedTables.length === 2 && /(另一个|另一张|另外的表|另外|别的表|其他表|那一张|那张表)/.test(t)) {
+      return tables[uploadedTables[0]];
+    }
   }
 
-  // Second pass: score each table by how well its fields match the query
+  // ── 2) 表名 / 别名精确包含匹配（取最长命中，防止表名互为子串时误命中，如"订单"⊂"销售订单表"）──
+  let exactMatch = null, exactLen = 0;
+  for (const name of names) {
+    const tbl = tables[name];
+    if (text.includes(name) && name.length > exactLen) { exactMatch = tbl; exactLen = name.length; }
+    if (tbl.alias && text.includes(tbl.alias) && tbl.alias.length > exactLen) { exactMatch = tbl; exactLen = tbl.alias.length; }
+  }
+  if (exactMatch) return exactMatch;
+
+  // ── 3) 按字段命中度打分选表 ──
+  // 上传表仅给较小优先分(+200)用于和演示表拉开差距；两张上传表之间不再同分，
+  // 真正按字段匹配分数择优选，字段名撞车时选字段更匹配的那张。
+  const UPLOAD_BONUS = 200;
   let bestTable = null;
   let bestScore = 0;
   for (const name of names) {
-    const t = tables[name];
-    let score = getTableBonus(t); // Add priority bonus
+    const tbl = tables[name];
+    let score = tbl.group === '上传数据' ? UPLOAD_BONUS : 0;
     // Partial alias match score
-    if (t.alias) {
-      for (let i = Math.min(t.alias.length, 4); i >= 2; i--) {
-        const sub = t.alias.substring(0, i);
+    if (tbl.alias) {
+      for (let i = Math.min(tbl.alias.length, 4); i >= 2; i--) {
+        const sub = tbl.alias.substring(0, i);
         if (text.includes(sub)) { score += i * 5; break; }
       }
     }
     // Field match score
-    const fields = t.fields || [];
+    const fields = tbl.fields || [];
     for (const f of fields) {
-      const fs = fieldMatchScore(text, f);
-      // Don't count PK fields for table scoring since they're unique identifiers
-      if (f.pk) continue;
-      score += fs;
+      if (f.pk) continue; // PK 不参与打分（唯一标识，无区分意义）
+      score += fieldMatchScore(text, f);
     }
-    if (score > bestScore) { bestScore = score; bestTable = t; }
+    if (score > bestScore) { bestScore = score; bestTable = tbl; }
   }
-  if (bestTable && bestScore > 0) return bestTable;
+  // 只有在「上传表加分」之外还有真实字段/别名信号时才提前返回，
+  // 避免两表都只拿到 +200 时误选（此时交给下方兜底回退到最近上传表）。
+  if (bestTable && bestScore > UPLOAD_BONUS) return bestTable;
 
-  // Fallback: partial alias match
+  // ── 4) 别名子串兜底 ──
   for (const name of names) {
-    const t = tables[name];
-    if (t.alias) {
-      for (let i = 2; i <= t.alias.length; i++) {
-        const sub = t.alias.substring(0, i);
-        if (sub.length >= 2 && text.includes(sub)) return t;
+    const tbl = tables[name];
+    if (tbl.alias) {
+      for (let i = 2; i <= tbl.alias.length; i++) {
+        const sub = tbl.alias.substring(0, i);
+        if (sub.length >= 2 && text.includes(sub)) return tbl;
       }
     }
   }
 
-  // If there are uploaded tables, use the most recently uploaded one as default
+  // ── 5) 实在无法判断：多上传表时回退到最近上传的那张（与原行为一致）──
   if (hasUploaded) {
     return tables[uploadedTables[uploadedTables.length - 1]];
   }
@@ -3299,6 +3865,13 @@ function findBestField(text, fields) {
   return bestScore > 0 ? bestField : fields[0];
 }
 
+// Default metric preference: amount-like fields first (matches user expectations
+// when a query mentions 销售/趋势 without naming a specific metric)
+function pickDefaultMetric(metrics) {
+  if (!metrics || metrics.length === 0) return null;
+  return metrics.find(f => /金额|额$|营收|gmv/i.test(f.desc || f.alias || '')) || metrics[0];
+}
+
 async function simulateAgentPipeline(flow, queryText) {
   const thinkingMsg = addMessage('assistant', '<div class="loading-dots"><span></span><span></span><span></span></div> 正在分析...');
   const targetTable = findTableInQuery(queryText);
@@ -3319,6 +3892,7 @@ async function simulateAgentPipeline(flow, queryText) {
       !f.pk &&
       f.role !== 'id' &&
       f.role !== 'date' &&
+      f.role !== 'boolean' &&
       !/(^|_)id$|^id$/i.test(f.name) &&
       !/编号|号码|单号|序号/i.test(f.desc || f.alias || '') &&
       /decimal|int|float|bigint|double|number|numeric/i.test(f.type)
@@ -3334,7 +3908,7 @@ async function simulateAgentPipeline(flow, queryText) {
     return false;
   });
   // Non-ID dimensions (regular categorical fields like 渠道, 城市, 状态, 品类, etc.)
-  let nonIdDims = fields.filter(f => f.role === 'dimension' && !/(^|_)id$|^id$/i.test(f.name) && !dates.includes(f) && !f.pk);
+  let nonIdDims = fields.filter(f => (f.role === 'dimension' || f.role === 'boolean') && !/(^|_)id$|^id$/i.test(f.name) && !dates.includes(f) && !f.pk);
   if (nonIdDims.length === 0) {
     // Fallback: find string/non-numeric fields that are not IDs, dates, or metrics
     nonIdDims = fields.filter(f =>
@@ -3382,11 +3956,23 @@ async function simulateAgentPipeline(flow, queryText) {
   // If flow is insight (trend), use date field as the grouping dimension
   // If user mentioned a date field explicitly, that's our date field
   let dateField = bestDateScore > 0 ? bestDate : (dates[0] || null);
-  const countQuery = /订单数|记录数|用户数|客户数|商品数|(?:订单|记录|用户|客户|商品).*(?:有多少|多少|几个|几笔|几条|几单)|(?:有多少|多少|几个|几笔|几条|几单).*(?:订单|记录|用户|客户|商品)/i.test(queryText);
+  const countQuery = /订单数|记录数|用户数|客户数|商品数|(?:订单|记录|用户|客户|商品).*(?:有多少|多少|几个|几笔|几条|几单)|(?:有多少|多少|几个|几笔|几条|几单).*(?:订单|记录|用户|客户|商品)/i.test(queryText)
+    // 泛化计数：问题里带"数量/次数"但没有命中任何具体数值字段时（如"查询问题类型数量"），按 COUNT 处理
+    || (bestMetricScore <= 15 && /数量|次数/.test(queryText));
   let primaryMetric = countQuery
-    ? { name: '_cnt', desc: /订单/.test(queryText) ? '订单数' : /用户/.test(queryText) ? '用户数' : /客户/.test(queryText) ? '客户数' : /商品/.test(queryText) ? '商品数' : '记录数', type: 'bigint', role: 'metric' }
+    ? { name: '_cnt', desc: /订单/.test(queryText) ? '订单数' : /用户/.test(queryText) ? '用户数' : /客户/.test(queryText) ? '客户数' : /商品/.test(queryText) ? '商品数' : /次数/.test(queryText) ? '次数' : /数量/.test(queryText) ? '数量' : '记录数', type: 'bigint', role: 'metric' }
     : (bestMetricScore > 15 ? bestMetric : null);
   let primaryDim = bestDimScore > 15 ? bestDim : null;
+  // 问句点名实体（客户/用户/买家/会员/顾客等价类）时，对应 ID 字段优先于部分匹配的普通维度
+  // （如「按客户统计」应落到 用户ID 而不是客户备注）
+  if (primaryDim) {
+    const ENTITY_WORDS = ['客户', '用户', '买家', '会员', '顾客'];
+    const dimLabel = (primaryDim.desc || primaryDim.alias || primaryDim.name || '');
+    if (ENTITY_WORDS.some(w => queryText.includes(w)) && !queryText.includes(dimLabel)) {
+      const idF = allIdFields.find(f => ENTITY_WORDS.some(w => (f.desc || f.alias || f.name || '').includes(w)));
+      if (idF && primaryDim.name !== idF.name && primaryDim.role !== 'id') primaryDim = idF;
+    }
+  }
 
   // Check if query is date-centric even if flow wasn't detected as insight
   const dateCentric = isDateCentricQuery(queryText);
@@ -3403,7 +3989,9 @@ async function simulateAgentPipeline(flow, queryText) {
     // Trend analysis: need date + metric
     if (dateCentric && flow !== 'insight') flow = 'insight'; // upgrade to insight
     if (!dateField && dates.length > 0) dateField = dates[0];
-    if (!primaryMetric && metrics.length > 0) primaryMetric = metrics[0]; // default to first metric (usually sales amount)
+    if (!primaryMetric && metrics.length > 0) primaryMetric = pickDefaultMetric(metrics); // prefer amount-like metric
+    // 月度粒度：「每月/按月/月度」→ 按月聚合
+    if (primaryMetric && /每月|按月|月度|按月份|各月/.test(queryText)) primaryMetric = { ...primaryMetric, _granularity: 'month' };
     // For date-centric queries, don't force a dimension (date is the dimension)
     primaryDim = null;
   } else if (pkCentric && flow !== 'dict' && flow !== 'detail') {
@@ -3412,8 +4000,19 @@ async function simulateAgentPipeline(flow, queryText) {
     flow = 'detail';
     if (!dateField && dates.length > 0) dateField = dates[0];
   } else if (flow === 'topn') {
-    if (!primaryMetric && metrics.length > 0) primaryMetric = metrics[0];
-    if (!primaryDim && nonIdDims.length > 0) primaryDim = nonIdDims[0];
+    if (!primaryMetric && metrics.length > 0) primaryMetric = pickDefaultMetric(metrics);
+    if (!primaryDim && nonIdDims.length > 0) primaryDim = nonIdDims.find(f => /名称|产品|货品|品名/.test(f.desc || f.alias || '')) || nonIdDims[0];
+    // 无普通维度时逐级降级：外键ID → 日期趋势 → 明细，避免 primaryDim 为空导致 SQL 生成崩溃
+    if (!primaryDim && fkIdFields.length > 0) primaryDim = fkIdFields[0];
+    if (!primaryDim && dates.length > 0) {
+      flow = 'insight';
+      if (!dateField) dateField = dates[0];
+      if (!primaryMetric && metrics.length > 0) primaryMetric = pickDefaultMetric(metrics);
+    }
+    if (!primaryDim) {
+      flow = 'detail';
+      if (!dateField && dates.length > 0) dateField = dates[0];
+    }
   } else if (flow === 'detail') {
     if (!dateField && dates.length > 0) dateField = dates[0];
   } else if (flow === 'metrics') {
@@ -3425,17 +4024,91 @@ async function simulateAgentPipeline(flow, queryText) {
     if (bestDateScore > 15 && !primaryDim && !fieldCentric) {
       flow = 'insight';
       if (!dateField) dateField = bestDate;
-      if (!primaryMetric && metrics.length > 0) primaryMetric = metrics[0];
+      if (!primaryMetric && metrics.length > 0) primaryMetric = pickDefaultMetric(metrics);
     } else {
       // Use the best matching dimension if found (even with low score, if it's the best match)
       if (!primaryDim) {
         if (bestDim && bestDimScore > 0) {
           primaryDim = bestDim;
-        } else if (!countQuery && nonIdDims.length > 0) {
+        } else if (bestDimScore <= 0) {
+          // 问句点名了实体（客户/用户/买家/会员等价类）但无普通维度命中时，按对应 ID 字段分组
+          const ENTITY_WORDS = ['客户', '用户', '买家', '会员', '顾客'];
+          const idF = ENTITY_WORDS.some(w => queryText.includes(w))
+            ? allIdFields.find(f => ENTITY_WORDS.some(w => (f.desc || f.alias || f.name || '').includes(w)))
+            : null;
+          if (idF) primaryDim = idF;
+        }
+        if (!primaryDim && !countQuery && nonIdDims.length > 0) {
           primaryDim = nonIdDims[0];
         }
       }
-      if (!primaryMetric && metrics.length > 0) primaryMetric = metrics[0];
+      if (!primaryMetric && metrics.length > 0) primaryMetric = pickDefaultMetric(metrics);
+    }
+  }
+
+  // 单值聚合问句（无分组词、未点名维度/日期）→ 强制“总计”维度：问总/平均/最大/最小/去重时直接返回一个数
+  if (isSingleValueAggQuery(queryText) && bestDimScore <= 15 && bestDateScore <= 15 && primaryDim && primaryDim.name !== '_total' && !primaryDim._secondary) {
+    primaryDim = { name: '_total', desc: '总计', type: 'varchar', role: 'dimension' };
+  }
+
+  // 「平均/均值/每单」→ AVG aggregation
+  const wantsAvg = /平均|均值|每单|人均|平均值/i.test(queryText) && !/最高|最低|最好|最差|最大|最小/.test(queryText);
+  if (wantsAvg && primaryMetric && primaryMetric.name !== '_cnt') {
+    primaryMetric = { ...primaryMetric, agg: 'AVG', desc: '平均' + (primaryMetric.desc || primaryMetric.name) };
+  }
+
+  // 「最大/最高」→ MAX，「最小/最低」→ MIN（仅单值问句；「销售额最高的品类」仍是分组排行，保持 SUM）
+  if (isSingleValueAggQuery(queryText) && primaryMetric && primaryMetric.name !== '_cnt' && primaryMetric.name !== '_cntd' && primaryMetric.name !== '_expr') {
+    if (/最大|最高|峰值/.test(queryText) && !/最小|最低|谷值/.test(queryText)) {
+      primaryMetric = { ...primaryMetric, agg: 'MAX', desc: '最大' + (primaryMetric.desc || primaryMetric.name) };
+    } else if (/最小|最低|谷值/.test(queryText)) {
+      primaryMetric = { ...primaryMetric, agg: 'MIN', desc: '最小' + (primaryMetric.desc || primaryMetric.name) };
+    }
+  }
+
+  // 「有多少个不同X / 几种X」→ COUNT(DISTINCT X)
+  const distinctM = queryText.match(/(?:不同|各类|各种|几种|去重)\s*(?:的)?\s*([\u4e00-\u9fa5A-Za-z_]{2,6})/)
+    || queryText.match(/([\u4e00-\u9fa5A-Za-z_]{2,6})\s*去重/);
+  if (distinctM && flow !== 'detail' && flow !== 'topn' && flow !== 'insight' && flow !== 'dict' && flow !== 'metrics') {
+    const word = (distinctM[1] || '').replace(/(?:的|有|几|个|是|数|量|个数|数目)+$/, '');
+    const dimByWord = w => allSearchableDims.find(f => {
+      const label = (f.desc || f.alias || f.name || '');
+      return label.includes(w) || getFieldSynonyms(label).some(sy => sy && sy.includes(w));
+    }) || allIdFields.find(f => {
+      const label = (f.desc || f.alias || f.name || '');
+      return label.includes(w) || getFieldSynonyms(label).some(sy => sy && sy.includes(w));
+    });
+    const df = word.length >= 2 ? dimByWord(word) : null;
+    if (df) {
+      primaryMetric = { name: '_cntd', desc: (/去重/.test(queryText) ? '去重' : '') + (df.desc || df.name) + '数', type: 'bigint', role: 'metric', _distinct: df.name };
+      primaryDim = { name: '_total', desc: '总计', type: 'varchar', role: 'dimension' };
+      flow = 'query';
+    }
+  }
+
+  // 「利润率/毛利率」→ 派生指标 SUM(利润)/SUM(金额)
+  if (/利润率|毛利率|盈利率/.test(queryText) && primaryMetric && primaryMetric.name !== '_expr') {
+    const numF = metrics.find(f => /利润/.test(f.desc || f.alias || f.name || ''));
+    const denF = metrics.find(f => /金额/.test(f.desc || f.alias || f.name || ''));
+    if (numF && denF) {
+      primaryMetric = { name: '_expr', desc: /利润率/.test(queryText) ? '利润率' : '毛利率', type: 'decimal', role: 'metric', _expr: { num: numF.name, den: denF.name } };
+      if (flow === 'detail' || flow === 'topn' || flow === 'insight') flow = 'query';
+      if (!primaryDim) primaryDim = { name: '_total', desc: '总计', type: 'varchar', role: 'dimension' };
+    }
+  }
+
+  // 双维度分组：「各渠道各品类」「按渠道和品类统计」
+  const twoDimMatch = /各\s*([\u4e00-\u9fa5]{1,5}?)\s*各\s*([\u4e00-\u9fa5]{1,5}?)(?:的|统计|$)/.exec(queryText)
+    || /按\s*([\u4e00-\u9fa5]{1,5}?)\s*(?:和|与)\s*([\u4e00-\u9fa5]{1,5}?)(?:统计|的|$)/.exec(queryText);
+  if (twoDimMatch && flow === 'query' && primaryDim && primaryDim.name !== '_total') {
+    const findDim = w => allSearchableDims.find(f => {
+      const label = (f.desc || f.alias || f.name || '');
+      return label.includes(w) || getFieldSynonyms(label).some(sy => sy && sy.includes(w));
+    });
+    const d1 = findDim(twoDimMatch[1]), d2 = findDim(twoDimMatch[2]);
+    if (d1 && d2 && d1.name !== d2.name) {
+      const secDim = (primaryDim.name === d2.name) ? d1 : d2;
+      primaryDim = { ...primaryDim, _secondary: secDim };
     }
   }
 
@@ -3463,7 +4136,7 @@ async function simulateAgentPipeline(flow, queryText) {
   await sleep(500);
   // Detect Top N limit from query
   let topN = 100;
-  const topNMatch = queryText.match(/(?:top|前|排名|最高|最好)\s*(\d+)/i);
+  const topNMatch = queryText.match(/(?:top|前|排名|最高|最好|最低|最差|最大|最小|最多|最少)\s*的?\s*(\d+)/i);
   if (topNMatch) topN = parseInt(topNMatch[1]) || 10;
   else if (queryText.includes('top') || /前\s*\d+/.test(queryText)) topN = 10;
   else if (flow === 'topn' && /哪个|哪一个|最高|最低|最好|最差|第一名|首位/i.test(queryText)) topN = 1;
@@ -3504,16 +4177,17 @@ async function simulateAgentPipeline(flow, queryText) {
   if (!primaryMetric && flow !== 'detail' && flow !== 'dict') {
     primaryMetric = metrics.length > 0 ? metrics[0] : { name: '_cnt', desc: '记录数', type: 'bigint', role: 'metric' };
   }
-  const metricExpr = primaryMetric ? (primaryMetric.name === '_cnt' ? 'COUNT(*)' : `SUM(${primaryMetric.name})`) : 'COUNT(*)';
+  const metricExpr = primaryMetric ? (primaryMetric.name === '_cnt' ? 'COUNT(*)' : primaryMetric.name === '_expr' ? `SUM(${primaryMetric._expr.num}) / SUM(${primaryMetric._expr.den})` : primaryMetric.agg === 'AVG' ? `AVG(${primaryMetric.name})` : primaryMetric.agg === 'MAX' ? `MAX(${primaryMetric.name})` : primaryMetric.agg === 'MIN' ? `MIN(${primaryMetric.name})` : `SUM(${primaryMetric.name})`) : 'COUNT(*)';
   const recordCountSelect = primaryMetric?.name === '_cnt' ? '' : ',\n       COUNT(*) AS 记录数';
 
   // Get visible columns for detail queries
   // Prioritize: PK fields, filtered fields (from WHERE conditions), date fields, then other non-ID fields
-  let visibleColsList = (targetTable.fields||[]).filter(f => f.role !== 'id' || f.pk);
+  // 修复：用户问题中明确提到的列（如"员工工号"被识别为 ID 型且非 PK）必须出现在明细 SELECT 中
+  let visibleColsList = (targetTable.fields||[]).filter(f => f.role !== 'id' || f.pk || fieldMatchScore(queryText, f) > 0);
   // Ensure WHERE condition fields are included in visible columns
   if (whereConditions && whereConditions.length > 0) {
     for (const wc of whereConditions) {
-      if (wc.field && !visibleColsList.includes(wc.field) && wc.field.role !== 'id') {
+      if (wc.field && !visibleColsList.includes(wc.field)) {
         visibleColsList.unshift(wc.field);
       }
     }
@@ -3564,7 +4238,8 @@ async function simulateAgentPipeline(flow, queryText) {
     const dateCol = dateField ? dateField.name : 'order_date';
     const dateLabel = dateField ? (dateField.desc || dateField.name) : '日期';
     const metricLabelInsight = primaryMetric.desc || primaryMetric.name;
-    sql = `-- ${targetTable.alias||targetTable.name}：${metricLabelInsight}按${dateLabel}趋势${filterComment}\nSELECT DATE(${dateCol}) AS \`${dateLabel}\`,\n       ${metricExpr} AS \`${metricLabelInsight}\`${recordCountSelect}\nFROM ${targetTable.name}\n${whereClause}GROUP BY DATE(${dateCol})\nORDER BY \`${dateLabel}\` ASC;`;
+    const dateExpr = primaryMetric._granularity === 'month' ? `strftime(${dateCol}, '%Y-%m')` : `CAST(${dateCol} AS DATE)`;
+    sql = `-- ${targetTable.alias||targetTable.name}：${metricLabelInsight}按${dateLabel}趋势${filterComment}\nSELECT ${dateExpr} AS \`${dateLabel}\`,\n       ${metricExpr} AS \`${metricLabelInsight}\`${recordCountSelect}\nFROM ${targetTable.name}\n${whereClause}GROUP BY ${dateExpr}\nORDER BY \`${dateLabel}\` ASC;`;
   } else if (flow === 'detail') {
     const orderCol = dateField ? dateField.name : (visibleCols[0] ? visibleCols[0].name : (targetTable.fields||[])[0].name);
     sql = `-- ${targetTable.alias||targetTable.name}：明细数据${filterComment}\nSELECT ${detailCols}\nFROM ${targetTable.name}\n${whereClause}ORDER BY ${orderCol} DESC\nLIMIT 100;`;
@@ -3573,16 +4248,22 @@ async function simulateAgentPipeline(flow, queryText) {
     const dimCol = primaryDim.name;
     const dimLabelSQL = primaryDim.desc || primaryDim.name;
     const metricLabelSQL = primaryMetric.desc || primaryMetric.name;
-    sql = `-- ${targetTable.alias||targetTable.name}：${dimLabelSQL} Top ${topN} ${metricLabelSQL}${filterComment}\nSELECT ${dimCol} AS \`${dimLabelSQL}\`,\n       ${metricExpr} AS \`${metricLabelSQL}\`${recordCountSelect}\nFROM ${targetTable.name}\n${whereClause}GROUP BY ${dimCol}\nORDER BY \`${metricLabelSQL}\` DESC\nLIMIT ${topN};`;
+    const topnAsc = /最低|最少|最小|最差|倒数|垫底|排名最后/.test(queryText);
+    sql = `-- ${targetTable.alias||targetTable.name}：${dimLabelSQL} Top ${topN} ${metricLabelSQL}${filterComment}\nSELECT ${dimCol} AS \`${dimLabelSQL}\`,\n       ${metricExpr} AS \`${metricLabelSQL}\`${recordCountSelect}\nFROM ${targetTable.name}\n${whereClause}GROUP BY ${dimCol}\nORDER BY \`${metricLabelSQL}\` ${topnAsc ? 'ASC' : 'DESC'}\nLIMIT ${topN};`;
+  } else if (primaryMetric.name === '_cntd') {
+    sql = `-- ${targetTable.alias||targetTable.name}：${primaryMetric.desc}${filterComment}\nSELECT COUNT(DISTINCT ${primaryMetric._distinct}) AS \`${primaryMetric.desc}\`\nFROM ${targetTable.name}\n${whereClause};`;
   } else {
-    // query - group by dimension
+    // query - group by dimension (supports an optional secondary dimension)
     const metricCol = primaryMetric.name;
     const dimCol = primaryDim.name;
     const dimLabelSQL = primaryDim.desc || primaryDim.name;
     const metricLabelSQL = primaryMetric.desc || primaryMetric.name;
+    const sec = primaryDim._secondary;
     const dimExpr = dimCol === '_total' ? "'总计'" : dimCol;
-    const groupByClause = dimCol === '_total' ? '' : `GROUP BY ${dimCol}\n`;
-    sql = `-- ${targetTable.alias||targetTable.name}：按${dimLabelSQL}统计${metricLabelSQL}${filterComment}\nSELECT ${dimExpr} AS \`${dimLabelSQL}\`,\n       ${metricExpr} AS \`${metricLabelSQL}\`${recordCountSelect}\nFROM ${targetTable.name}\n${whereClause}${groupByClause}ORDER BY \`${metricLabelSQL}\` DESC\nLIMIT 100;`;
+    const secClause = sec ? `,\n       ${sec.name} AS \`${sec.desc || sec.name}\`` : '';
+    const secLabel = sec ? `×${sec.desc || sec.name}` : '';
+    const groupByClause = (dimCol === '_total' && !sec) ? '' : `GROUP BY ${dimCol}${sec ? ', ' + sec.name : ''}\n`;
+    sql = `-- ${targetTable.alias||targetTable.name}：按${dimLabelSQL}${secLabel}统计${metricLabelSQL}${filterComment}\nSELECT ${dimExpr} AS \`${dimLabelSQL}\`${secClause},\n       ${metricExpr} AS \`${metricLabelSQL}\`${recordCountSelect}\nFROM ${targetTable.name}\n${whereClause}${groupByClause}ORDER BY \`${metricLabelSQL}\` DESC\nLIMIT 100;`;
   }
 
   await sleep(400);
@@ -3598,6 +4279,7 @@ async function simulateAgentPipeline(flow, queryText) {
     dimension: dimLabel,
     table_count: Object.keys(tables).length
   });
+  if (window.DM_TRACK) DM_TRACK.sqlGenerated({ intent: intentName, target_table: targetTable.name, selected_table: targetTable.name, table_matched: !!targetTable, duration_ms: currentTelemetryQuery ? Date.now() - currentTelemetryQuery.startedAt : 0 });
 
   // Dictionary, metric discovery and recommendation queries execute directly
   if (flow === 'dict' || flow === 'metrics' || flow === 'recommend') {
@@ -3607,7 +4289,7 @@ async function simulateAgentPipeline(flow, queryText) {
 
   // Show SQL confirmation card for query/insight/topn/detail
   const seq = ++confirmSeq;
-  pendingConfirm = { seq, msgEl: thinkingMsg, table: targetTable, metric: primaryMetric, dim: primaryDim, dateField, flow, sql, pipelineHTML, topN, whereConditions };
+  pendingConfirm = { seq, msgEl: thinkingMsg, table: targetTable, metric: primaryMetric, dim: primaryDim, dateField, flow, sql, pipelineHTML, topN, whereConditions, queryText };
 
   const metricOptions = (targetTable.fields||[]).filter(f => f.role === 'metric' && !f.pk);
   // If no role-based metric, fall back to numeric non-ID fields
@@ -3630,7 +4312,7 @@ async function simulateAgentPipeline(flow, queryText) {
     return false;
   });
 
-  const dimOptions = (targetTable.fields||[]).filter(f => f.role === 'dimension' && !allDateOptions.includes(f) && !f.pk);
+  const dimOptions = (targetTable.fields||[]).filter(f => (f.role === 'dimension' || f.role === 'boolean') && !allDateOptions.includes(f) && !f.pk);
   // Include non-PK ID fields (foreign keys like user_id in sales_order) as selectable dimensions
   const idDimOptions = (targetTable.fields||[]).filter(f => !allDateOptions.includes(f) && !f.pk && (f.role === 'id' || /(^|_)id$|^id$/i.test(f.name) || /编号|号码|单号/i.test(f.desc || f.alias || '')));
   // Fallback: if no dimension found via role, use any non-date non-PK non-metric field
@@ -3748,16 +4430,18 @@ function updatePendingConfirm(seq, field, value) {
 function regenerateSQL(seq, silent) {
   if (!pendingConfirm || pendingConfirm.seq !== seq) return;
   const { table: t, metric, dim, dateField, flow, topN, whereConditions } = pendingConfirm;
-  const metricExpr = metric.name === '_cnt' ? 'COUNT(*)' : `SUM(${metric.name})`;
+  const metricExpr = metric.name === '_cnt' ? 'COUNT(*)' : metric.agg === 'AVG' ? `AVG(${metric.name})` : metric.agg === 'MAX' ? `MAX(${metric.name})` : metric.agg === 'MIN' ? `MIN(${metric.name})` : `SUM(${metric.name})`;
   const recordCountSelect = metric.name === '_cnt' ? '' : ',\n       COUNT(*) AS 记录数';
   const limitN = topN || 100;
   let sql;
 
   // Get visible columns for detail queries
-  let visibleColsList = (t.fields||[]).filter(f => f.role !== 'id' || f.pk);
+  // 修复：用户问题中明确提到的列（如"员工工号"被识别为 ID 型且非 PK）必须出现在明细 SELECT 中
+  const _regenQuery = (pendingConfirm && pendingConfirm.queryText) || '';
+  let visibleColsList = (t.fields||[]).filter(f => f.role !== 'id' || f.pk || fieldMatchScore(_regenQuery, f) > 0);
   if (whereConditions && whereConditions.length > 0) {
     for (const wc of whereConditions) {
-      if (wc.field && !visibleColsList.includes(wc.field) && wc.field.role !== 'id') {
+      if (wc.field && !visibleColsList.includes(wc.field)) {
         visibleColsList.unshift(wc.field);
       }
     }
@@ -3787,7 +4471,7 @@ function regenerateSQL(seq, silent) {
   if (flow === 'insight') {
     const dateCol = dateField ? dateField.name : 'order_date';
     const dateLabel = dateField ? (dateField.desc || dateField.name) : '日期';
-    sql = `-- ${t.alias||t.name}：${metric.desc||metric.name}按${dateLabel}趋势${filterComment}\nSELECT DATE(${dateCol}) AS \`${dateLabel}\`,\n       ${metricExpr} AS \`${metric.desc||metric.name}\`${recordCountSelect}\nFROM ${t.name}\n${whereClause}GROUP BY DATE(${dateCol})\nORDER BY \`${dateLabel}\` ASC;`;
+    sql = `-- ${t.alias||t.name}：${metric.desc||metric.name}按${dateLabel}趋势${filterComment}\nSELECT CAST(${dateCol} AS DATE) AS \`${dateLabel}\`,\n       ${metricExpr} AS \`${metric.desc||metric.name}\`${recordCountSelect}\nFROM ${t.name}\n${whereClause}GROUP BY CAST(${dateCol} AS DATE)\nORDER BY \`${dateLabel}\` ASC;`;
   } else if (flow === 'detail') {
     const orderCol = dateField ? dateField.name : (visibleCols[0] ? visibleCols[0].name : (t.fields||[])[0].name);
     sql = `-- ${t.alias||t.name}：明细数据${filterComment}\nSELECT ${detailCols}\nFROM ${t.name}\n${whereClause}ORDER BY ${orderCol} DESC\nLIMIT 100;`;
@@ -3808,6 +4492,7 @@ function regenerateSQL(seq, silent) {
   if (!silent) {
     if (currentTelemetryQuery) currentTelemetryQuery.sql = sql;
     recordProductEvent('sql_regenerated', { sql, status: 'success' });
+    if (window.DM_TRACK) DM_TRACK.sqlReject({ intent: flow, reason: 'regenerate', dwell_seconds: (currentTelemetryQuery ? Math.round((Date.now() - currentTelemetryQuery.startedAt) / 1000) : 0) });
     showToast('SQL 已重新生成');
   }
 }
@@ -3823,7 +4508,7 @@ function generateFollowUpQuestions(flow, t, metric, dim, dateField, aggResult, m
 
   // Helper: find fields by role
   const metrics = fields.filter(f => f.role === 'metric' && !f.pk);
-  const dims = fields.filter(f => f.role === 'dimension' && !/(^|_)id$|^id$/i.test(f.name) && !f.pk);
+  const dims = fields.filter(f => (f.role === 'dimension' || f.role === 'boolean') && !/(^|_)id$|^id$/i.test(f.name) && !f.pk);
   const dates = fields.filter(f => f.role === 'date' || /date|time/i.test(f.type));
   const currentMetricLabel = metric ? (metric.desc || metric.name) : '数值';
   const currentDimLabel = dim ? (dim.desc || dim.name) : '维度';
@@ -3962,6 +4647,7 @@ async function confirmExecute(seq) {
   pendingConfirm = null;
 
   recordProductEvent('sql_confirmed', { sql, intent: flow, status: 'confirmed' });
+  if (window.DM_TRACK) DM_TRACK.sqlConfirm({ intent: flow, dwell_seconds: (currentTelemetryQuery ? Math.round((Date.now() - currentTelemetryQuery.startedAt) / 1000) : 0) });
   await continueExecution(msgEl, table, metric, dim, dateField, flow, sql, pipelineHTML, topN, undefined, whereConditions);
 }
 
@@ -3973,27 +4659,32 @@ async function continueExecution(msgEl, t, metric, dim, dateField, flow, sql, pi
   await sleep(500);
   updatePipelineStepOnMsg(msgEl, 'step-exec', 'done');
 
-  // Aggregation (data processing)
+  // Aggregation (data processing) —— 包 try/catch 以追踪 SQL 执行成功/失败
   let aggResult;
-  let multiResults = null; // for recommend flow: multiple analysis results
-  if (flow === 'insight') {
-    aggResult = aggregateByDate(t, metric, dateField, whereConditions);
-  } else if (flow === 'query' || flow === 'topn') {
-    aggResult = aggregateByDim(t, metric, dim, whereConditions);
-    if (flow === 'topn' && aggResult && aggResult.rows) {
-      const n = topN || 10;
-      aggResult.rows = aggResult.rows.slice(0, n);
+  let multiResults = null;
+  try {
+    if (flow === 'insight') {
+      aggResult = aggregateByDate(t, metric, dateField, whereConditions);
+    } else if (flow === 'query' || flow === 'topn') {
+      aggResult = aggregateByDim(t, metric, dim, whereConditions);
+      if (flow === 'topn' && aggResult && aggResult.rows) {
+        const n = topN || 10;
+        if (/ORDER BY[^;\n]*\bASC\b/i.test(sql)) aggResult.rows = [...aggResult.rows].reverse();
+        aggResult.rows = aggResult.rows.slice(0, n);
+      }
+    } else if (flow === 'detail') {
+      aggResult = getDetailRows(t, whereConditions);
+    } else if (flow === 'metrics') {
+      aggResult = getMetricSummary(t, recommendCount || 2);
+    } else if (flow === 'recommend') {
+      multiResults = generateMultiAnalyses(t, recommendCount || 2);
     }
-  } else if (flow === 'detail') {
-    aggResult = getDetailRows(t, whereConditions);
-  } else if (flow === 'metrics') {
-    aggResult = getMetricSummary(t, recommendCount || 2);
-  } else if (flow === 'recommend') {
-    // For recommend flow: generate multiple analysis combinations
-    multiResults = generateMultiAnalyses(t, recommendCount || 2);
+    if (window.DM_TRACK) DM_TRACK.sqlExecuteSuccess({ intent: flow, chart_type: (flow === 'query' || flow === 'insight' || flow === 'topn' || flow === 'recommend') ? 'bar_line_combo' : 'none', result_row_count: (aggResult && aggResult.rows ? aggResult.rows.length : (aggResult && aggResult.total != null ? aggResult.total : 0)) });
+  } catch (execErr) {
+    if (window.DM_TRACK) DM_TRACK.sqlExecuteFail({ intent: flow, error_code: 'execution_error', error_reason: (execErr && execErr.message) || 'execution_error', sql: sql });
+    updateThinking(msgEl, '<div style="margin-top:8px;padding:12px 16px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;font-size:13px;color:#991b1b;line-height:1.7;">分析执行出错：' + escapeHtml((execErr && execErr.message) || '未知错误') + '。可以换一种问法再试。</div>');
+    return;
   }
-
-  // Visual phase
   await sleep(200);
   updatePipelineStepOnMsg(msgEl, 'step-visual', 'active');
   updateThinking(msgEl, `${getDonePipelineHTML().replace('step-visual">✓ 可视化生成', 'step-visual" style="animation:pulse 1s infinite;">📊 可视化生成')}<div class="sql-label" style="margin-top:8px;">SQL执行完成</div><div class="sql-block">${escapeHtml(sql)}</div><div style="padding:20px;text-align:center;color:var(--muted);"><span class="loading-dots"><span></span><span></span><span></span></span> 正在生成BI报表与数据分析...</div>`);
@@ -4017,6 +4708,17 @@ async function continueExecution(msgEl, t, metric, dim, dateField, flow, sql, pi
   } else {
     resultHTML = getQueryResult(t, metric, dim, aggResult, chartId);
   }
+  // P0-2 4.5: 查询结果为空时给出友好提示（不报错、不空白）
+  if (aggResult && !aggResult.noDate) {
+    const _isEmpty =
+      (flow === 'detail' && aggResult.total === 0) ||
+      ((flow === 'query' || flow === 'topn') && (!aggResult.rows || aggResult.rows.length === 0)) ||
+      (flow === 'insight' && (!aggResult.rows || aggResult.rows.length === 0));
+    if (_isEmpty) {
+      resultHTML += '<div style="margin-top:12px;padding:12px 16px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;font-size:13px;color:#991b1b;line-height:1.7;">没有符合条件的记录。可以试试：去掉部分筛选条件、放宽时间范围，或换一种问法再试。</div>';
+    }
+  }
+
   // Generate contextual follow-up questions
   const followUpQuestions = generateFollowUpQuestions(flow, t, metric, dim, dateField, aggResult, multiResults);
   const followUpHTML = renderFollowUpHTML(followUpQuestions);
@@ -4031,6 +4733,7 @@ async function continueExecution(msgEl, t, metric, dim, dateField, flow, sql, pi
     chart_type: (flow === 'query' || flow === 'insight' || flow === 'topn' || flow === 'recommend') ? 'bar_line_combo' : 'none',
     table_count: Object.keys(tables).length
   });
+  if (window.DM_TRACK) DM_TRACK.analysisSuccess({ intent: flow, chart_type: (flow === 'query' || flow === 'insight' || flow === 'topn' || flow === 'recommend') ? 'bar_line_combo' : 'none', result_row_count: (aggResult && aggResult.rows ? aggResult.rows.length : (aggResult && aggResult.total != null ? aggResult.total : 0)), duration_ms: currentTelemetryQuery ? Date.now() - currentTelemetryQuery.startedAt : 0 });
 
   // Auto-scroll to the result - use multiple attempts to ensure DOM is ready
   let scrolled = false;
@@ -4264,11 +4967,18 @@ function getTableData(t) {
 // Apply WHERE conditions to filter rows in-memory
 function filterRows(rows, conditions) {
   if (!conditions || conditions.length === 0) return rows;
+  // 布尔值归一化：真值族 → 'Y'，假值族 → 'N'，其余原样
+  const normBool = (v) => {
+    const s = String(v == null ? '' : v).trim().toLowerCase();
+    if (/^(是|true|1|y|yes|t|对|有|支持|有效|正常|新客|新用户|新客户|新会员|男|线上|内|自营)$/.test(s)) return 'Y';
+    if (/^(否|false|0|n|no|f|错|无|不支持|无效|异常|老客|老用户|老客户|老会员|女|线下|外|非自营)$/.test(s)) return 'N';
+    return s;
+  };
   return rows.filter(row => {
     for (const c of conditions) {
       const fieldName = c.field.name;
       const cellVal = row[fieldName];
-      const cellStr = String(cellVal == null ? '' : cellVal);
+      const cellStr = String(cellVal == null ? '' : cellVal).trim();
 
       // Helper: check if a substring match is valid (not preceded by a negation char)
       const isNegatedSubstring = (str, sub) => {
@@ -4297,7 +5007,14 @@ function filterRows(rows, conditions) {
         });
         if (matched) return false;
       } else if (c.op === '=') {
-        if (cellStr !== c.value) {
+        const cv = parseNumeric(c.value);
+        const nv = parseNumeric(cellVal);
+        if (cv != null && nv != null) {
+          // 数值精确相等：避免 金额=0 被 "100" 含子串 "0" 误命中（子串匹配对数字失效）
+          if (nv !== cv) return false;
+        } else if (c.field && c.field.role === 'boolean') {
+          if (normBool(cellVal) !== normBool(c.value)) return false;
+        } else if (cellStr !== c.value) {
           // Not exact match — allow non-negated substring match only
           const idx = cellStr.indexOf(c.value);
           if (idx === -1) return false;            // no substring at all
@@ -4308,6 +5025,28 @@ function filterRows(rows, conditions) {
             }
           }
         }
+      } else if (c.op === 'like') {
+        const mode = c.mode || 'contains';
+        const sub = String(c.value == null ? '' : c.value).trim().toLowerCase();
+        if (sub.length > 0) {
+          const cs = cellStr.toLowerCase();
+          if (mode === 'prefix' ? !cs.startsWith(sub) : mode === 'suffix' ? !cs.endsWith(sub) : !cs.includes(sub)) return false;
+        }
+      } else if (c.op === '!=') {
+        if (c.field && c.field.role === 'boolean') {
+          if (normBool(cellVal) === normBool(c.value)) return false;
+        } else if (cellStr === c.value) return false;
+      } else if (c.op === 'is_null') {
+        if (!(cellVal == null || cellStr.trim() === '')) return false;
+      } else if (c.op === 'is_not_null') {
+        if (cellVal == null || cellStr.trim() === '') return false;
+      } else if (c.op === 'between') {
+        const num = parseNumeric(cellVal);
+        if (num == null || num < c.value[0] || num > c.value[1]) return false;
+      } else if (c.op === 'gtfield' || c.op === 'ltfield') {
+        const a = parseNumeric(cellVal), b = parseNumeric(row[c.value]);
+        if (a == null || b == null) return false;
+        if (c.op === 'gtfield' ? !(a > b) : !(a < b)) return false;
       } else if (c.op === '>') {
         const num = parseFloat(cellVal);
         if (isNaN(num) || num <= c.value) return false;
@@ -4321,9 +5060,17 @@ function filterRows(rows, conditions) {
         const num = parseFloat(cellVal);
         if (isNaN(num) || num > c.value) return false;
       } else if (c.op === 'date_range') {
-        // Date filtering is handled by the date parsing in aggregate functions
-        // For detail rows, we don't apply date filter here (the SQL comment indicates it, but we show all matching)
-        continue;
+        // Apply structured date range in-memory (absolute or relative)
+        const d = parseDate(cellVal);
+        if (!d) return false;
+        if (c.value && c.value.months) {
+          const mo = d.getMonth() + 1;
+          const lo = Math.min(...c.value.months), hi = Math.max(...c.value.months);
+          if (mo < lo || mo > hi) return false;
+          if (c.value.year && d.getFullYear() !== c.value.year) return false;
+        } else if (c.value && c.value.from) {
+          if (d < c.value.from || d > c.value.to) return false;
+        }
       }
     }
     return true;
@@ -4336,51 +5083,120 @@ function aggregateByDim(t, metric, dim, conditions) {
   const groups = new Map();
   const counts = new Map();
   let grandTotal = 0;
+  let grandCount = 0;
   const metricName = metric.name;
   const dimName = dim.name;
   const isCount = metricName === '_cnt';
+  const isAvg = !!(metric && metric.agg === 'AVG');
+  const isMax = !!(metric && metric.agg === 'MAX');
+  const isMin = !!(metric && metric.agg === 'MIN');
+  const isCountDistinct = metricName === '_cntd';
+  const isExpr = metricName === '_expr';
+  const exprDef = metric && metric._expr;
+  const dim2Name = dim._secondary ? dim._secondary.name : null;
+  const distinctCol = metric && metric._distinct;
+  const distinctSet = new Set();
+  const groupMax = new Map(), groupMin = new Map();
+  let globalMax = null, globalMin = null;
+  const exprNumByGroup = new Map(), exprDenByGroup = new Map();
+  let exprNumSum = 0, exprDenSum = 0;
   rows.forEach(r => {
+    if (isCountDistinct && distinctCol) {
+      const v = r[distinctCol];
+      if (v != null && v !== '') distinctSet.add(String(v));
+      return;
+    }
     let dimVal;
     if (dimName === '_total') {
       dimVal = '总计';
     } else {
-      dimVal = r[dimName];
-      if (dimVal === null || dimVal === undefined || dimVal === '') dimVal = '(空)';
-      dimVal = String(dimVal);
+      dimVal = String(r[dimName] == null ? '' : r[dimName]).trim();
+      if (dimVal === '') dimVal = '(空)';
+    }
+    let groupKey = dimVal;
+    if (dim2Name) {
+      let dv = String(r[dim2Name] == null ? '' : r[dim2Name]).trim();
+      if (dv === '') dv = '(空)';
+      groupKey = dimVal + '·' + dv;
     }
     let n;
     if (isCount) {
       n = 1;
+    } else if (isExpr) {
+      n = 0;
     } else {
       const num = parseNumeric(r[metricName]);
       n = num === null ? 0 : num;
     }
-    groups.set(dimVal, (groups.get(dimVal) || 0) + n);
-    counts.set(dimVal, (counts.get(dimVal) || 0) + 1);
+    groups.set(groupKey, (groups.get(groupKey) || 0) + n);
+    counts.set(groupKey, (counts.get(groupKey) || 0) + 1);
     grandTotal += n;
+    grandCount++;
+    if (isMax || isMin) {
+      if (isMax) {
+        const cur = groupMax.has(groupKey) ? groupMax.get(groupKey) : -Infinity;
+        if (n > cur) groupMax.set(groupKey, n);
+        if (globalMax === null || n > globalMax) globalMax = n;
+      } else {
+        const cur = groupMin.has(groupKey) ? groupMin.get(groupKey) : Infinity;
+        if (n < cur) groupMin.set(groupKey, n);
+        if (globalMin === null || n < globalMin) globalMin = n;
+      }
+    }
+    if (isExpr && exprDef) {
+      const a = parseNumeric(r[exprDef.num]) || 0, b = parseNumeric(r[exprDef.den]) || 0;
+      exprNumByGroup.set(groupKey, (exprNumByGroup.get(groupKey) || 0) + a);
+      exprDenByGroup.set(groupKey, (exprDenByGroup.get(groupKey) || 0) + b);
+      exprNumSum += a; exprDenSum += b;
+    }
   });
+  if (isCountDistinct) {
+    groups.set('总计', distinctSet.size);
+    counts.set('总计', rows.length);
+  }
   const result = [];
   groups.forEach((val, key) => {
-    result.push({ dim: key, val: Math.round(val * 100) / 100, cnt: counts.get(key) });
+    let v;
+    if (isExpr) v = (exprDenByGroup.get(key) || 0) !== 0 ? (exprNumByGroup.get(key) || 0) / (exprDenByGroup.get(key) || 0) : 0;
+    else if (isMax) v = groupMax.has(key) ? groupMax.get(key) : 0;
+    else if (isMin) v = groupMin.has(key) ? groupMin.get(key) : 0;
+    else v = isAvg ? val / (counts.get(key) || 1) : val;
+    result.push({ dim: key, val: Math.round(v * 100) / 100, cnt: counts.get(key) });
   });
   result.sort((a,b) => b.val - a.val);
-  return { rows: result.slice(0, 10), total: Math.round(grandTotal*100)/100 };
+  const totalVal = isCountDistinct ? distinctSet.size
+    : isExpr ? (exprDenSum !== 0 ? exprNumSum / exprDenSum : 0)
+    : isMax ? (globalMax === null ? 0 : globalMax)
+    : isMin ? (globalMin === null ? 0 : globalMin)
+    : (isAvg && grandCount ? grandTotal / grandCount : grandTotal);
+  // 不再写死 Top10：返回全部分组（上限 500 防御极端高基数），topN 由调用方按 flow 再截断
+  return { rows: result.slice(0, 500), total: Math.round(totalVal*100)/100 };
 }
 
 function aggregateByDate(t, metric, dateField, conditions) {
   let rows = getTableData(t);
   rows = filterRows(rows, conditions);
   const groups = new Map();
+  const counts = new Map();
   const metricName = metric.name;
   const dateName = dateField ? dateField.name : null;
   const isCount = metricName === '_cnt';
+  const isAvg = !!(metric && metric.agg === 'AVG');
+  const isMax = !!(metric && metric.agg === 'MAX');
+  const isMin = !!(metric && metric.agg === 'MIN');
+  const isMonth = !!(metric && metric._granularity === 'month');
   let grandTotal = 0;
+  let grandCount = 0;
+  const keyMax = new Map(), keyMin = new Map();
+  let globalMax = null, globalMin = null;
   rows.forEach(r => {
     if (!dateName) return;
     const raw = r[dateName];
     const d = parseDate(raw);
     if (!d) return;
-    const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    const key = isMonth
+      ? d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0')
+      : d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
     let n;
     if (isCount) {
       n = 1;
@@ -4388,30 +5204,46 @@ function aggregateByDate(t, metric, dateField, conditions) {
       const num = parseNumeric(r[metricName]);
       n = num === null ? 0 : num;
     }
+    if (isMax || isMin) {
+      if (isMax) {
+        const cur = keyMax.has(key) ? keyMax.get(key) : -Infinity;
+        if (n > cur) keyMax.set(key, n);
+        if (globalMax === null || n > globalMax) globalMax = n;
+      } else {
+        const cur = keyMin.has(key) ? keyMin.get(key) : Infinity;
+        if (n < cur) keyMin.set(key, n);
+        if (globalMin === null || n < globalMin) globalMin = n;
+      }
+    }
     groups.set(key, (groups.get(key) || 0) + n);
+    counts.set(key, (counts.get(key) || 0) + 1);
     grandTotal += n;
+    grandCount++;
   });
   const sorted = Array.from(groups.entries()).sort((a,b) => a[0].localeCompare(b[0]));
-  // If no date data, fallback to generating 30-day sequence
+  // If the user applied filters but nothing matched, return an empty result
+  // instead of a fabricated 30-day sequence (never fake data for real queries).
+  if (sorted.length === 0 && conditions && conditions.length > 0) {
+    return { rows: [], total: 0, isMock: false, empty: true };
+  }
+  // No date data available: never fabricate. Signal the UI to show a friendly notice.
   if (sorted.length === 0) {
-    const base = 4000;
-    const labels = [], vals = [];
-    for (let i = 0; i < 30; i++) {
-      const dd = new Date(); dd.setDate(dd.getDate() - 29 + i);
-      labels.push((dd.getMonth()+1)+'/'+dd.getDate());
-      vals.push(Math.round(base + Math.sin(i/4)*800 + Math.random()*300 + i*30));
-    }
-    return { rows: labels.map((l,i) => ({dim: l, val: vals[i]})), total: vals.reduce((a,b)=>a+b,0), isMock: true };
+    return { rows: [], total: 0, isMock: false, empty: true, noDate: true };
   }
   const result = sorted.map(([key, val]) => {
     const parts = key.split('-');
-    const shortLabel = parseInt(parts[1],10) + '/' + parseInt(parts[2],10);
-    return { dim: shortLabel, fullDate: key, val: Math.round(val*100)/100 };
+    const shortLabel = isMonth ? key : parseInt(parts[1],10) + '/' + parseInt(parts[2],10);
+    const v = isMax ? (keyMax.get(key) || 0) : isMin ? (keyMin.get(key) || 0) : isAvg ? val / (counts.get(key) || 1) : val;
+    return { dim: shortLabel, fullDate: key, val: Math.round(v*100)/100 };
   });
-  return { rows: result, total: Math.round(grandTotal*100)/100, isMock: false };
+  const totalVal = isMax ? (globalMax === null ? 0 : globalMax)
+    : isMin ? (globalMin === null ? 0 : globalMin)
+    : (isAvg && grandCount ? grandTotal / grandCount : grandTotal);
+  return { rows: result, total: Math.round(totalVal*100)/100, isMock: false };
 }
 
 function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escapeAttr(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;'); }
 
 function getDictResult(t) {
   return `<div class="result-card">
@@ -4423,9 +5255,29 @@ function getDictResult(t) {
     </table></div>
     <div class="result-actions">
       <button class="btn btn-primary btn-sm" onclick="chatInput.value='查询${t.alias||t.name}的数据';chatInput.dispatchEvent(new Event('input'));sendMessage();">去查询 →</button>
-      <button class="btn btn-outline btn-sm" onclick="navigator.clipboard&&navigator.clipboard.writeText('${t.name}');showToast('已复制表名')">📋 复制</button>
+      <button class="btn btn-outline btn-sm" onclick="copyDataDict('${t.name.replace(/'/g, "\\'")}')" title="复制完整数据字典：表名 + 字段/类型/说明（Markdown 表格，可直接粘贴到文档或发给 AI）">📋 复制</button>
     </div>
   </div>`;
+}
+
+// Copy the full data dictionary of a table as a Markdown table (name + fields + types + comments)
+function copyDataDict(tableName) {
+  const t = tables[tableName];
+  if (!t) { showToast('未找到该表'); return; }
+  const lines = [];
+  lines.push(`# ${t.name}${t.alias ? ' (' + t.alias + ')' : ''} 数据字典`);
+  if (t.desc) lines.push(t.desc);
+  lines.push('');
+  lines.push('| 字段名 | 类型 | 说明 |');
+  lines.push('| --- | --- | --- |');
+  (t.fields || []).forEach(f => {
+    lines.push(`| ${f.name}${f.pk ? '（主键）' : ''} | ${f.type || ''} | ${(f.desc || '').replace(/\|/g, '\\|').replace(/\n/g, ' ')} |`);
+  });
+  const text = lines.join('\n');
+  copyTextRobust(text, (ok) => {
+    if (!ok) { showToast('复制失败，请手动复制'); return; }
+    showToast('📋 已复制完整数据字典（Markdown 表格）');
+  });
 }
 
 function getMetricSummary(t, count) {
@@ -4774,19 +5626,19 @@ function getQueryResult(t, metric, dim, agg, chartId) {
 
       <!-- 2. 业务背景与分析目标 -->
       <div class="report-section">
-        <div class="report-section-title"><span class="section-num">2</span> 业务背景与分析目标</div>
-        <div class="report-sub-title">2.1 业务背景</div>
+        <div class="report-section-title"><span class="section-num">1</span> 业务背景与分析目标</div>
+        <div class="report-sub-title">1.1 业务背景</div>
         <p style="font-size:13px;line-height:1.8;color:#374151;margin:0;">
           本次数据分析针对「${t.alias||t.name}」数据表，围绕「${dimLabel}维度${metricLabel}」开展聚合统计分析。通过对${rows.length}个${dimLabel}的${metricLabel}进行对比，识别核心贡献维度、分布特征及潜在风险，为业务决策提供数据支撑。
         </p>
-        <div class="report-sub-title">2.2 分析目标</div>
+        <div class="report-sub-title">1.2 分析目标</div>
         <ul style="font-size:13px;line-height:2;color:#374151;margin:8px 0;padding-left:20px;">
           <li>评估${t.alias||t.name}各${dimLabel}的${metricLabel}整体表现及规模</li>
           <li>识别${metricLabel}领先与落后的${dimLabel}，定位优势与短板</li>
           <li>分析数据分布特征（集中度/均衡度），判断业务结构健康度</li>
           <li>基于数据发现提出可落地的策略建议，支持经营决策</li>
         </ul>
-        <div class="report-sub-title">2.3 术语说明</div>
+        <div class="report-sub-title">1.3 术语说明</div>
         <div style="margin:8px 0;">
           <span class="term-tag">${metricLabel}：SUM(${metric.name})</span>
           <span class="term-tag">${dimLabel}：分组维度字段</span>
@@ -4797,8 +5649,8 @@ function getQueryResult(t, metric, dim, agg, chartId) {
 
       <!-- 3. 指标体系与统计口径 -->
       <div class="report-section">
-        <div class="report-section-title"><span class="section-num">3</span> 指标体系与统计口径</div>
-        <div class="report-sub-title">3.1 核心指标</div>
+        <div class="report-section-title"><span class="section-num">2</span> 指标体系与统计口径</div>
+        <div class="report-sub-title">2.1 核心指标</div>
         <table class="template-table">
           <thead><tr><th>指标名称</th><th>指标定义</th><th>计算公式</th><th>统计周期</th><th>数据来源</th></tr></thead>
           <tbody>
@@ -4807,24 +5659,24 @@ function getQueryResult(t, metric, dim, agg, chartId) {
             <tr><td>占比</td><td>单个${dimLabel}占总体的比例</td><td>${metricLabel}/合计${metricLabel}</td><td>全量</td><td>计算字段</td></tr>
           </tbody>
         </table>
-        <div class="report-sub-title">3.2 分析维度</div>
+        <div class="report-sub-title">2.2 分析维度</div>
         <div style="margin:8px 0;">
           <span class="term-tag">${dimLabel}（核心维度）</span>
-          ${(t.fields||[]).filter(f=>f.role==='dimension'&&f.name!==dim.name).slice(0,5).map(f=>`<span class="term-tag">${f.desc||f.name}</span>`).join('')}
+          ${(t.fields||[]).filter(f=>(f.role==='dimension'||f.role==='boolean')&&f.name!==dim.name).slice(0,5).map(f=>`<span class="term-tag">${f.desc||f.name}</span>`).join('')}
         </div>
       </div>
 
       <!-- 4. 数据来源与质量说明 -->
       <div class="report-section">
-        <div class="report-section-title"><span class="section-num">4</span> 数据来源与质量说明</div>
-        <div class="report-sub-title">4.1 数据源清单</div>
+        <div class="report-section-title"><span class="section-num">3</span> 数据来源与质量说明</div>
+        <div class="report-sub-title">3.1 数据源清单</div>
         <table class="template-table">
           <thead><tr><th>数据源</th><th>数据内容</th><th>数据行数</th><th>字段数</th><th>数据类型</th></tr></thead>
           <tbody>
             <tr><td>${t.alias||t.name}</td><td>${(t.fields||[]).map(f=>f.desc||f.name).slice(0,4).join('、')}等</td><td>${(t.totalRows||t.dataRows?.length||0).toLocaleString()}</td><td>${(t.fields||[]).length}</td><td>${dataSource.includes('真实')?'用户上传数据':'示例数据'}</td></tr>
           </tbody>
         </table>
-        <div class="report-sub-title">4.2 数据质量检查</div>
+        <div class="report-sub-title">3.2 数据质量检查</div>
         <table class="template-table">
           <thead><tr><th>检查项目</th><th>检查结果</th><th>说明</th></tr></thead>
           <tbody>
@@ -4837,7 +5689,7 @@ function getQueryResult(t, metric, dim, agg, chartId) {
 
       <!-- 5. 指标报表展示（详细发现） -->
       <div class="report-section">
-        <div class="report-section-title"><span class="section-num">5</span> 分析发现与归因</div>
+        <div class="report-section-title"><span class="section-num">4</span> 分析发现与归因</div>
         <ul class="finding-list">
           ${findings.map(f => `<li class="finding-item ${f.type}"><span class="finding-icon">${f.icon}</span><span class="finding-text">${f.text}</span></li>`).join('')}
         </ul>
@@ -4845,7 +5697,7 @@ function getQueryResult(t, metric, dim, agg, chartId) {
 
       <!-- 6. 策略建议与行动计划 -->
       <div class="report-section">
-        <div class="report-section-title"><span class="section-num">6</span> 策略建议与行动计划</div>
+        <div class="report-section-title"><span class="section-num">5</span> 策略建议与行动计划</div>
         ${suggestions.map(s => `<div class="suggestion-card">
           <div class="sug-title">${s.title}<span class="sug-priority ${s.priority}">${s.priority==='high'?'高优先级':s.priority==='mid'?'中优先级':'低优先级'}</span></div>
           <div>${s.text}</div>
@@ -4861,7 +5713,7 @@ function getQueryResult(t, metric, dim, agg, chartId) {
 
       <!-- 8. 附录 -->
       <div class="report-section">
-        <div class="report-section-title"><span class="section-num">7</span> 附录</div>
+        <div class="report-section-title"><span class="section-num">6</span> 附录</div>
         <div class="report-sub-title">数据说明</div>
         <div style="font-size:12px;color:var(--muted);line-height:1.8;padding:12px;background:#f8fafc;border-radius:8px;">
           <strong style="color:var(--ink);">数据来源：</strong>${dataSource}，由DataBrain智能分析引擎自动生成。<br>
@@ -4880,6 +5732,22 @@ function getInsightResult(t, metric, dateField, agg, chartId) {
   const rows = agg?.rows || [];
   const total = agg?.total || 0;
   const isMock = agg?.isMock;
+  // P0-1: 无日期列时，绝不伪造趋势图，给出友好提示 + 替代表述建议
+  if (agg && agg.noDate) {
+    const dims = (t.fields || []).filter(f => f.role === 'dimension' || f.role === 'category' || f.type === 'text' || f.type === 'category').slice(0, 2).map(f => f.desc || f.name);
+    const met = (t.fields || []).find(f => f.role === 'metric' || f.type === 'number');
+    const metLabel = met ? (met.desc || met.name) : '指标';
+    const dimText = dims.length ? dims.join('、') : '维度';
+    return '<div class="result-card">' +
+      '<h3>📊 ' + metricLabel + ' 趋势分析</h3>' +
+      '<div style="padding:18px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;font-size:14px;line-height:1.9;color:#7c2d12;">' +
+      '⚠️ 当前表没有可用的<strong>日期列</strong>，无法绘制时间序列趋势图（我们不会用示例数据冒充）。<br>' +
+      '你可以改问我这类问题：<br>' +
+      '1. 各' + dimText + '的' + metLabel + '统计<br>' +
+      '2. 按' + dimText + '分组排名 Top5<br>' +
+      '3. 某个条件下的' + metLabel + '明细' +
+      '</div></div>';
+  }
   let trend = '波动', trendPct = 0, anomaly = null, peak = rows[0], valley = rows[0];
   if (rows.length >= 2) {
     const first = rows[0].val, last = rows[rows.length-1].val;
@@ -5166,19 +6034,19 @@ function getInsightResult(t, metric, dateField, agg, chartId) {
 
       <!-- 2. 业务背景与分析目标 -->
       <div class="report-section">
-        <div class="report-section-title"><span class="section-num">2</span> 业务背景与分析目标</div>
-        <div class="report-sub-title">2.1 业务背景</div>
+        <div class="report-section-title"><span class="section-num">1</span> 业务背景与分析目标</div>
+        <div class="report-sub-title">1.1 业务背景</div>
         <p style="font-size:13px;line-height:1.8;color:#374151;margin:0;">
           本次趋势分析针对「${t.alias||t.name}」数据表，围绕「${metricLabel}按${dateLabel}的变化趋势」开展时间序列分析。通过对${rows.length}期数据的追踪，识别整体走势（${trend}）、周期性特征、峰值低谷及异常波动，为业务决策提供趋势判断依据。
         </p>
-        <div class="report-sub-title">2.2 分析目标</div>
+        <div class="report-sub-title">1.2 分析目标</div>
         <ul style="font-size:13px;line-height:2;color:#374151;margin:8px 0;padding-left:20px;">
           <li>判断${metricLabel}的整体趋势方向（上升/下降/平稳）及变化幅度</li>
           <li>识别期间峰值、低谷及异常波动时间点</li>
           <li>评估趋势健康度，预警潜在风险</li>
           <li>基于趋势特征提出针对性策略建议</li>
         </ul>
-        <div class="report-sub-title">2.3 术语说明</div>
+        <div class="report-sub-title">1.3 术语说明</div>
         <div style="margin:8px 0;">
           <span class="term-tag">环比：本期vs上期变化率</span>
           <span class="term-tag">峰值：期间最高值</span>
@@ -5189,8 +6057,8 @@ function getInsightResult(t, metric, dateField, agg, chartId) {
 
       <!-- 3. 指标体系与统计口径 -->
       <div class="report-section">
-        <div class="report-section-title"><span class="section-num">3</span> 指标体系与统计口径</div>
-        <div class="report-sub-title">3.1 核心指标</div>
+        <div class="report-section-title"><span class="section-num">2</span> 指标体系与统计口径</div>
+        <div class="report-sub-title">2.1 核心指标</div>
         <table class="template-table">
           <thead><tr><th>指标名称</th><th>指标定义</th><th>计算公式</th><th>统计周期</th></tr></thead>
           <tbody>
@@ -5199,7 +6067,7 @@ function getInsightResult(t, metric, dateField, agg, chartId) {
             <tr><td>期均值</td><td>分析期内平均值</td><td>合计/期数</td><td>全期</td></tr>
           </tbody>
         </table>
-        <div class="report-sub-title">3.3 对比口径</div>
+        <div class="report-sub-title">2.3 对比口径</div>
         <div style="margin:8px 0;">
           <span class="term-tag">环比：逐期对比</span>
           <span class="term-tag">均值基准：全期平均值</span>
@@ -5209,7 +6077,7 @@ function getInsightResult(t, metric, dateField, agg, chartId) {
 
       <!-- 4. 数据来源与质量说明 -->
       <div class="report-section">
-        <div class="report-section-title"><span class="section-num">4</span> 数据来源与质量说明</div>
+        <div class="report-section-title"><span class="section-num">3</span> 数据来源与质量说明</div>
         <table class="template-table">
           <thead><tr><th>数据源</th><th>覆盖时间</th><th>数据期数</th><th>异常检测</th></tr></thead>
           <tbody>
@@ -5229,7 +6097,7 @@ function getInsightResult(t, metric, dateField, agg, chartId) {
 
       <!-- 5. 异常识别与归因 -->
       <div class="report-section">
-        <div class="report-section-title"><span class="section-num">5</span> 异常识别与归因分析</div>
+        <div class="report-section-title"><span class="section-num">4</span> 异常识别与归因分析</div>
         <ul class="finding-list">
           ${findings.map(f => `<li class="finding-item ${f.type}"><span class="finding-icon">${f.icon}</span><span class="finding-text">${f.text}</span></li>`).join('')}
         </ul>
@@ -5237,7 +6105,7 @@ function getInsightResult(t, metric, dateField, agg, chartId) {
 
       <!-- 6. 策略建议 -->
       <div class="report-section">
-        <div class="report-section-title"><span class="section-num">6</span> 策略建议与行动计划</div>
+        <div class="report-section-title"><span class="section-num">5</span> 策略建议与行动计划</div>
         ${suggestions.map(s => `<div class="suggestion-card">
           <div class="sug-title">${s.title}<span class="sug-priority ${s.priority}">${s.priority==='high'?'高优先级':s.priority==='mid'?'中优先级':'低优先级'}</span></div>
           <div>${s.text}</div>
@@ -5246,7 +6114,7 @@ function getInsightResult(t, metric, dateField, agg, chartId) {
 
       <!-- 7. 附录 -->
       <div class="report-section">
-        <div class="report-section-title"><span class="section-num">7</span> 附录</div>
+        <div class="report-section-title"><span class="section-num">6</span> 附录</div>
         <div style="font-size:12px;color:var(--muted);line-height:1.8;padding:12px;background:#f8fafc;border-radius:8px;">
           <strong style="color:var(--ink);">数据来源：</strong>${dataSource}，由DataBrain智能分析引擎自动生成。<br>
           <strong style="color:var(--ink);">分析方法：</strong>${metricLabel}按${dateLabel}聚合，异常检测采用1.5倍标准差法则。<br>
@@ -5355,6 +6223,32 @@ function getDetailResult(t, detail) {
     const topCat = catDistributions[0];
     insights.push(`<strong>${topCat.field.desc || topCat.field.name}</strong>：共${topCat.uniqueCount}种取值，最高频「${topCat.top3[0].val}」出现${topCat.top3[0].cnt}次（${topCat.top3[0].pct}%）`);
   }
+
+  // ===== Store query context so「保存为报表」works for detail flow =====
+  let distRows = [];
+  let distField = null;
+  if (catDistributions.length > 0) {
+    distField = catDistributions[0].field;
+    const valCounts2 = {};
+    allRows.forEach(r => {
+      const v = r[distField.name];
+      if (v === null || v === undefined || v === '') return;
+      const key = String(v);
+      valCounts2[key] = (valCounts2[key] || 0) + 1;
+    });
+    distRows = Object.entries(valCounts2).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([dim, val]) => ({ dim, val }));
+  }
+  lastQueryContext = {
+    tableName: t.name, tableAlias: t.alias || t.name,
+    metricName: distField ? distField.name : 'record_count',
+    metricLabel: distField ? (distField.desc || distField.name) : '记录数',
+    dimName: distField ? distField.name : 'record',
+    dimLabel: distField ? (distField.desc || distField.name) : '取值',
+    chartType: 'bar', flow: 'detail',
+    rows: distRows,
+    total: distRows.length > 0 ? distRows.reduce((s, x) => s + x.val, 0) : total,
+    insight: insights.length > 0 ? insights[0].replace(/<[^>]+>/g, '') : `明细数据查询，共匹配 ${total.toLocaleString()} 条记录，返回前 ${Math.min(allRows.length, 50)} 条。`
+  };
 
   const renderRow = (r) => `<tr>${fields.map(f => {
     let val = r[f.name];
@@ -5500,18 +6394,18 @@ function getDetailResult(t, detail) {
 
       <!-- 2. 业务背景与分析目标 -->
       <div class="report-section">
-        <div class="report-section-title"><span class="section-num">2</span> 业务背景与分析目标</div>
-        <div class="report-sub-title">2.1 查询背景</div>
+        <div class="report-section-title"><span class="section-num">1</span> 业务背景与分析目标</div>
+        <div class="report-sub-title">1.1 查询背景</div>
         <p style="font-size:13px;line-height:1.8;color:#374151;margin:0;">
           本次明细数据查询针对「${t.alias||t.name}」数据表，返回符合条件的最新记录，共匹配 <strong>${total.toLocaleString()}</strong> 条记录。本次返回前 <strong>${Math.min(allRows.length, 50)}</strong> 条最新数据供查看。
         </p>
-        <div class="report-sub-title">2.2 查询目标</div>
+        <div class="report-sub-title">1.2 查询目标</div>
         <ul style="font-size:13px;line-height:2;color:#374151;margin:8px 0;padding-left:20px;">
           <li>查看符合条件的明细记录，了解具体数据内容</li>
           <li>核查关键字段取值，验证数据准确性</li>
           <li>为进一步聚合分析提供数据基础</li>
         </ul>
-        <div class="report-sub-title">2.3 字段说明</div>
+        <div class="report-sub-title">1.3 字段说明</div>
         <div style="margin:8px 0;">
           ${fields.map(f => `<span class="term-tag">${f.desc||f.name}（${f.type||'文本'}）</span>`).join('')}
         </div>
@@ -5519,18 +6413,18 @@ function getDetailResult(t, detail) {
 
       <!-- 3. 数据字典 -->
       <div class="report-section">
-        <div class="report-section-title"><span class="section-num">3</span> 数据字典</div>
+        <div class="report-section-title"><span class="section-num">2</span> 数据字典</div>
         <table class="template-table">
           <thead><tr><th>字段名</th><th>字段类型</th><th>业务含义</th><th>角色分类</th></tr></thead>
           <tbody>
-            ${fields.map(f => `<tr><td><strong>${f.desc||f.name}</strong></td><td>${f.type||'文本'}</td><td>${f.desc||f.name}字段</td><td>${f.role==='metric'?'指标':f.role==='dimension'?'维度':f.role==='date'?'日期':f.role==='id'?'ID':'其他'}</td></tr>`).join('')}
+            ${fields.map(f => `<tr><td><strong>${f.desc||f.name}</strong></td><td>${f.type||'文本'}</td><td>${f.desc||f.name}字段</td><td>${f.role==='metric'?'指标':f.role==='dimension'?'维度':f.role==='boolean'?'布尔':f.role==='date'?'日期':f.role==='id'?'ID':'其他'}</td></tr>`).join('')}
           </tbody>
         </table>
       </div>
 
       <!-- 4. 数据来源与质量 -->
       <div class="report-section">
-        <div class="report-section-title"><span class="section-num">4</span> 数据来源与质量说明</div>
+        <div class="report-section-title"><span class="section-num">3</span> 数据来源与质量说明</div>
         <table class="template-table">
           <thead><tr><th>数据源</th><th>数据表</th><th>总数据量</th><th>字段总数</th><th>数据类型</th></tr></thead>
           <tbody>
@@ -5550,7 +6444,7 @@ function getDetailResult(t, detail) {
 
       <!-- 5. 附录 -->
       <div class="report-section">
-        <div class="report-section-title"><span class="section-num">5</span> 附录</div>
+        <div class="report-section-title"><span class="section-num">4</span> 附录</div>
         <div style="font-size:12px;color:var(--muted);line-height:1.8;padding:12px;background:#f8fafc;border-radius:8px;">
           <strong style="color:var(--ink);">数据来源：</strong>${dataSource}，由DataBrain智能分析引擎自动生成。<br>
           <strong style="color:var(--ink);">查询说明：</strong>明细查询默认返回最多50条最新记录。<br>
@@ -5571,7 +6465,7 @@ function generateMultiAnalyses(t, count) {
   let metrics = fields.filter(f => f.role === 'metric');
   if (metrics.length === 0) {
     metrics = fields.filter(f =>
-      !f.pk && f.role !== 'id' && f.role !== 'date' &&
+      !f.pk && f.role !== 'id' && f.role !== 'date' && f.role !== 'boolean' &&
       !/(^|_)id$|^id$/i.test(f.name) &&
       !/编号|号码|单号|序号/i.test(f.desc || f.alias || '') &&
       /decimal|int|float|bigint|double|number|numeric/i.test(f.type)
@@ -5589,7 +6483,7 @@ function generateMultiAnalyses(t, count) {
   });
 
   // Get dimension fields (categorical fields)
-  let dims = fields.filter(f => f.role === 'dimension' && !/(^|_)id$|^id$/i.test(f.name) && !dates.includes(f) && !f.pk);
+  let dims = fields.filter(f => (f.role === 'dimension' || f.role === 'boolean') && !/(^|_)id$|^id$/i.test(f.name) && !dates.includes(f) && !f.pk);
   if (dims.length === 0) {
     dims = fields.filter(f =>
       !f.pk && !metrics.includes(f) && !dates.includes(f) && f.role !== 'id' &&
@@ -5723,6 +6617,27 @@ function getRecommendResult(t, multiResults, baseCid) {
   const totalRows = t.totalRows || (t.dataRows || []).length;
   const fieldCount = (t.fields || []).length;
   const aid = 'act-r' + Date.now();
+
+  // ===== Store query context so「保存为报表」works for recommend flow =====
+  if (multiResults && multiResults.length > 0) {
+    const fr = multiResults[0];
+    const frRows = (fr.aggResult && fr.aggResult.rows)
+      ? fr.aggResult.rows.map(x => ({ dim: String(x.dim), val: Number(x.val) || 0 }))
+      : [];
+    lastQueryContext = {
+      tableName: t.name, tableAlias: tableLabel,
+      metricName: fr.metric ? fr.metric.name : 'metric',
+      metricLabel: metricLabel,
+      dimName: fr.dim ? fr.dim.name : 'dim',
+      dimLabel: fr.dim ? (fr.dim.desc || fr.dim.name) : '维度',
+      chartType: fr.type === 'insight' ? 'line' : 'bar', flow: 'recommend',
+      rows: frRows,
+      total: frRows.reduce((s, x) => s + x.val, 0),
+      insight: `${fr.title || '智能推荐分析'}：${fr.desc || ''}`
+    };
+  } else {
+    lastQueryContext = null;
+  }
 
   // Calculate overall stats
   let totalMetricSum = 0;
@@ -5960,6 +6875,7 @@ function renderInlineChartById(containerId, flow, t, metric, dim, agg, retryCoun
   } catch(e) {
     console.error('Chart render error:', e);
     recordProductEvent('chart_rendered', { status: 'failed', chart_type: flow, error_code: e?.message || 'render_error' });
+    if (window.DM_TRACK) DM_TRACK.analysisFail({ chart_type: flow, error_code: e?.message || 'render_error' });
     if (retryCount < 5) {
       setTimeout(() => renderInlineChartById(containerId, flow, t, metric, dim, agg, retryCount + 1), 300);
     }
@@ -6425,30 +7341,102 @@ function toggleTableRows(btn, tableId) {
   }
 }
 
-// Toggle full report (Feishu template 8 sections) + auto expand/collapse table rows
+// Toggle full report (Feishu template 8 sections) as a floating popup.
+// The report no longer expands inline in the conversation stream — it is shown
+// as a centered overlay so the chat stays compact.
+let reportPopupMaskEl = null;
+
+function getReportPopupMask() {
+  if (!reportPopupMaskEl) {
+    reportPopupMaskEl = document.createElement('div');
+    reportPopupMaskEl.className = 'report-popup-mask';
+    reportPopupMaskEl.id = 'reportPopupMask';
+    reportPopupMaskEl.addEventListener('click', () => {
+      const openSection = document.querySelector('.full-report-section.report-popup-mode');
+      if (openSection) closeReportPopup(openSection);
+    });
+    document.body.appendChild(reportPopupMaskEl);
+  }
+  return reportPopupMaskEl;
+}
+
+function resetViewFullButtons(reportId) {
+  document.querySelectorAll('.btn-view-full').forEach(b => {
+    const oc = b.getAttribute('onclick') || '';
+    if (oc.includes("'" + reportId + "'")) {
+      b.innerHTML = '📄 查看完整报告 <span style="font-size:11px;">▼</span>';
+    }
+  });
+}
+
+function openReportPopup(section, btn, tableId) {
+  section.classList.add('show', 'report-popup-mode');
+  if (tableId) {
+    const hiddenRows = document.getElementById(tableId);
+    if (hiddenRows) hiddenRows.classList.add('show');
+  }
+  getReportPopupMask().classList.add('show');
+  if (!section.querySelector('.report-popup-close')) {
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'report-popup-close';
+    closeBtn.type = 'button';
+    closeBtn.title = '关闭报告';
+    closeBtn.innerHTML = '✕';
+    closeBtn.addEventListener('click', () => closeReportPopup(section));
+    section.insertBefore(closeBtn, section.firstChild);
+  }
+  if (btn) btn.innerHTML = '📁 收起报告 <span style="font-size:11px;">▲</span>';
+  document.body.style.overflow = 'hidden';
+  // Section was display:none before opening; resize ECharts instances inside
+  // so charts restored from hidden containers render at the right size.
+  setTimeout(() => {
+    try {
+      if (window.echarts) {
+        section.querySelectorAll('div').forEach(el => {
+          const inst = echarts.getInstanceByDom(el);
+          if (inst) inst.resize();
+        });
+      }
+    } catch (e) {}
+  }, 260);
+}
+
+function closeReportPopup(section, btn, tableId) {
+  section.classList.remove('show', 'report-popup-mode');
+  const closeBtn = section.querySelector('.report-popup-close');
+  if (closeBtn) closeBtn.remove();
+  if (reportPopupMaskEl) reportPopupMaskEl.classList.remove('show');
+  document.body.style.overflow = '';
+  if (btn) {
+    btn.innerHTML = '📄 查看完整报告 <span style="font-size:11px;">▼</span>';
+  } else {
+    resetViewFullButtons(section.id);
+  }
+  if (tableId) {
+    const hiddenRows = document.getElementById(tableId);
+    if (hiddenRows) hiddenRows.classList.remove('show');
+  }
+  if (btn) btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
 function toggleFullReport(btn, reportId, tableId) {
   const section = document.getElementById(reportId);
   if (!section) return;
-  const isShown = section.classList.contains('show');
-  if (isShown) {
-    section.classList.remove('show');
-    btn.innerHTML = '📄 查看完整报告 <span style="font-size:11px;">▼</span>';
-    // Also collapse table rows
-    if (tableId) {
-      const hiddenRows = document.getElementById(tableId);
-      if (hiddenRows) hiddenRows.classList.remove('show');
-    }
-    btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  if (section.classList.contains('show')) {
+    closeReportPopup(section, btn, tableId);
   } else {
-    section.classList.add('show');
-    btn.innerHTML = '📁 收起报告 <span style="font-size:11px;">▲</span>';
-    // Also expand table rows
-    if (tableId) {
-      const hiddenRows = document.getElementById(tableId);
-      if (hiddenRows) hiddenRows.classList.add('show');
-    }
-    setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    openReportPopup(section, btn, tableId);
   }
+}
+
+// Clone the full-report section for PDF/print export: force visible and strip
+// the popup-mode fixed positioning so the export renders in normal flow.
+function prepareReportClone(section) {
+  const clone = section.cloneNode(true);
+  clone.classList.add('show');
+  clone.classList.remove('report-popup-mode');
+  clone.style.cssText = 'display:block;';
+  return clone;
 }
 
 // Download the expanded full report section as PDF (html2canvas + jsPDF),
@@ -6471,9 +7459,7 @@ function downloadFullReport(btn, reportId) {
   const runDownloadFallback = () => {
     try {
       // Clone the section and inline current page styles so the file is standalone
-      const clone = section.cloneNode(true);
-      clone.classList.add('show');
-      clone.style.display = 'block';
+      const clone = prepareReportClone(section);
       const pageStyles = Array.from(document.querySelectorAll('style')).map(s => s.innerHTML).join('\n');
       const html = '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>' + title + '</title>' +
         '<style>' + pageStyles + '</style>' +
@@ -6493,9 +7479,7 @@ function downloadFullReport(btn, reportId) {
     try {
       const w = window.open('', '_blank');
       if (!w) { runDownloadFallback(); return; }
-      const clone = section.cloneNode(true);
-      clone.classList.add('show');
-      clone.style.display = 'block';
+      const clone = prepareReportClone(section);
       const pageStyles = Array.from(document.querySelectorAll('style')).map(s => s.innerHTML).join('\n');
       w.document.open();
       w.document.write('<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>' + title + '</title><style>' + pageStyles + '</style><style>body{margin:0;background:#fff;padding:24px;}</style></head><body>' + clone.outerHTML + '</body></html>');
@@ -6512,9 +7496,7 @@ function downloadFullReport(btn, reportId) {
     holder.style.top = '0';
     holder.style.width = '794px';
     holder.style.background = '#ffffff';
-    const clone = section.cloneNode(true);
-    clone.classList.add('show');
-    clone.style.display = 'block';
+    const clone = prepareReportClone(section);
     holder.appendChild(clone);
     document.body.appendChild(holder);
     html2canvas(holder, { scale: 2, backgroundColor: '#ffffff', useCORS: true }).then(canvas => {
@@ -6559,6 +7541,7 @@ function handleFeedback(btn, type, groupId) {
       setTimeout(() => { btn.style.transform = ''; }, 200);
       showToast('感谢您的反馈！👍');
       recordProductEvent('feedback_submitted', { status: 'success', feedback: 'like' });
+      saveFeedbackRecord({ type: 'like', groupId: groupId });
     }
   } else if (type === 'dislike') {
     const isActive = btn.classList.contains('disliked');
@@ -6568,10 +7551,183 @@ function handleFeedback(btn, type, groupId) {
       btn.classList.add('disliked');
       btn.style.transform = 'scale(1.2)';
       setTimeout(() => { btn.style.transform = ''; }, 200);
-      showToast('感谢您的反馈，我们会继续改进！');
-      recordProductEvent('feedback_submitted', { status: 'success', feedback: 'dislike' });
+      // 在按钮旁弹出轻量意见浮层
+      openFeedbackPopover(btn, groupId);
+    } else {
+      // 再次点击 = 撤销差评
+      closeFeedbackPopover();
+      removeFeedbackRecord(groupId, 'dislike');
+      showToast('已取消差评');
     }
   }
+}
+
+/* ============================================================
+   意见反馈：轻量浮层 + 飞书机器人推送
+   页面内不提供反馈记录入口，意见只经飞书机器人收集
+   ============================================================ */
+const FEEDBACK_STORAGE_KEY = 'databrain_feedback';
+const FEEDBACK_REASONS = ['答案不准确', '没理解我的问题', '数据对不上', '图表看不懂', '报告太长太乱', '其他'];
+
+let feedbackDraftContext = null;
+let feedbackAnchorEl = null;
+
+function getFeedbackRecords() {
+  try {
+    const raw = localStorage.getItem(FEEDBACK_STORAGE_KEY);
+    const list = raw ? JSON.parse(raw) : [];
+    return Array.isArray(list) ? list : [];
+  } catch (e) { return []; }
+}
+
+function setFeedbackRecords(list) {
+  try {
+    localStorage.setItem(FEEDBACK_STORAGE_KEY, JSON.stringify(list));
+  } catch (e) {}
+}
+
+function saveFeedbackRecord(rec) {
+  const list = getFeedbackRecords();
+  const groupId = rec.groupId || '';
+  // 同一张卡的点赞/差评互斥；重复提交意见时替换旧记录
+  const filtered = list.filter(r => !(groupId && r.groupId === groupId));
+  filtered.unshift({
+    id: telemetryRandomId('fb'),
+    ts: new Date().toISOString(),
+    type: rec.type || 'dislike',
+    groupId: groupId,
+    question: rec.question || '',
+    sql: rec.sql || '',
+    flow: rec.flow || '',
+    reasons: rec.reasons || [],
+    comment: rec.comment || ''
+  });
+  setFeedbackRecords(filtered.slice(0, 200));
+}
+
+function removeFeedbackRecord(groupId, type) {
+  if (!groupId) return;
+  const list = getFeedbackRecords().filter(r => !(r.groupId === groupId && (!type || r.type === type)));
+  setFeedbackRecords(list);
+}
+
+function renderFeedbackReasons() {
+  const el = document.getElementById('fbReasons');
+  if (!el) return;
+  el.innerHTML = FEEDBACK_REASONS.map(r =>
+    `<button type="button" class="fb-chip" data-reason="${r}" onclick="this.classList.toggle('selected')">${r}</button>`
+  ).join('');
+}
+
+// 贴着触发按钮浮出：优先下方，空间不足翻到上方，水平不越界
+function positionFeedbackPopover(anchor) {
+  const el = document.getElementById('feedbackPopover');
+  if (!el) return;
+  el.classList.add('show');
+  el.style.visibility = 'hidden';
+  const rect = (anchor && anchor.getBoundingClientRect) ? anchor.getBoundingClientRect() : { top: 0, bottom: 0, left: 0 };
+  const pw = el.offsetWidth || 560;
+  const ph = el.offsetHeight || 170;
+  const gap = 10;
+  const vw = window.innerWidth || 1440;
+  const vh = window.innerHeight || 900;
+  let top = (rect.bottom || 0) + gap;
+  if (top + ph > vh - 12) top = Math.max(12, (rect.top || 0) - ph - gap);
+  let left = Math.min(Math.max(12, rect.left || 12), Math.max(12, vw - pw - 12));
+  el.style.top = top + 'px';
+  el.style.left = left + 'px';
+  el.style.visibility = '';
+}
+
+function onFeedbackKeydown(e) {
+  if (e && e.key === 'Escape') closeFeedbackPopover();
+}
+
+function onFeedbackDocClick(e) {
+  const el = document.getElementById('feedbackPopover');
+  if (!el || !el.classList.contains('show')) return;
+  if (el.contains(e.target)) return;
+  if (feedbackAnchorEl && feedbackAnchorEl.contains(e.target)) return;
+  closeFeedbackPopover();
+}
+
+function onFeedbackScrollOrResize() {
+  const el = document.getElementById('feedbackPopover');
+  if (!el || !el.classList.contains('show') || !feedbackAnchorEl) return;
+  const r = feedbackAnchorEl.getBoundingClientRect ? feedbackAnchorEl.getBoundingClientRect() : null;
+  const vh = window.innerHeight || 900;
+  if (r && (r.bottom < 0 || r.top > vh)) { closeFeedbackPopover(); return; }
+  positionFeedbackPopover(feedbackAnchorEl);
+}
+
+function bindFeedbackDismiss(on) {
+  const fn = on ? 'addEventListener' : 'removeEventListener';
+  [document, window].forEach(t => { if (t && typeof t[fn] === 'function') t[fn]('click', onFeedbackDocClick, true); });
+  [window].forEach(t => {
+    if (!t) return;
+    if (typeof t[fn] === 'function') {
+      t[fn]('scroll', onFeedbackScrollOrResize, true);
+      t[fn]('resize', onFeedbackScrollOrResize);
+      t[fn]('keydown', onFeedbackKeydown);
+    }
+  });
+}
+
+function openFeedbackPopover(btn, groupId) {
+  feedbackDraftContext = {
+    groupId: groupId || '',
+    question: (currentTelemetryQuery && currentTelemetryQuery.query) || '',
+    flow: (currentTelemetryQuery && currentTelemetryQuery.flow) || '',
+    sql: (currentTelemetryQuery && currentTelemetryQuery.sql) || ''
+  };
+  feedbackAnchorEl = btn || null;
+  renderFeedbackReasons();
+  const commentEl = document.getElementById('fbComment');
+  if (commentEl) commentEl.value = '';
+  positionFeedbackPopover(btn);
+  // 延后绑定外部点击，避免本次点击立刻把浮层关掉
+  setTimeout(() => bindFeedbackDismiss(true), 0);
+}
+
+function closeFeedbackPopover() {
+  const el = document.getElementById('feedbackPopover');
+  if (el) el.classList.remove('show');
+  feedbackAnchorEl = null;
+  bindFeedbackDismiss(false);
+  feedbackDraftContext = null;
+}
+
+function submitFeedback() {
+  const reasons = Array.from(document.querySelectorAll('#fbReasons .fb-chip.selected')).map(b => b.getAttribute('data-reason'));
+  const commentEl = document.getElementById('fbComment');
+  const comment = ((commentEl && commentEl.value) || '').trim();
+  if (reasons.length === 0 && !comment) {
+    showToast('请选择一个原因，或写下你的意见');
+    return;
+  }
+  const ctx = feedbackDraftContext || {};
+  saveFeedbackRecord({
+    type: 'dislike',
+    groupId: ctx.groupId,
+    question: ctx.question,
+    sql: ctx.sql,
+    flow: ctx.flow,
+    reasons: reasons,
+    comment: comment
+  });
+  // 经 recordProductEvent 钩子推送到飞书机器人（buildCard 渲染原因与详情）
+  recordProductEvent('feedback_submitted', {
+    status: 'success',
+    feedback: 'dislike',
+    feedback_reasons: reasons.join('、'),
+    feedback_comment: comment,
+    query: ctx.question || '',
+    sql: ctx.sql || '',
+    intent: ctx.flow || ''
+  });
+  if (window.DM_TRACK) DM_TRACK.chartFeedback({ feedback: 'dislike', group_id: ctx.groupId || '', reasons: reasons.join('、') });
+  closeFeedbackPopover();
+  showToast('✅ 已收到，感谢你的反馈');
 }
 
 /* Robust clipboard copy with fallback for file:// / non-secure contexts.
@@ -6677,6 +7833,7 @@ function handleCopyResult(btn, groupId) {
 
   copyTextRobust(text, (ok) => {
     if (!ok) { showToast('复制失败，请手动选择复制'); return; }
+    if (window.DM_TRACK) DM_TRACK.resultCopy({ table_row_count: tableRowCount });
     btn.classList.add('copied');
     const label = btn.querySelector('.action-btn-label');
     const origText = label ? label.textContent : '';
@@ -6777,6 +7934,7 @@ function exportReportPDF(id) {
   const r = reports.find(x => x.id === rid);
   if (!r) { showToast('没有可导出的报表'); return; }
   showToast('⏳ 正在生成 PDF...');
+  if (window.DM_TRACK) DM_TRACK.resultExport({ export_format: 'pdf' });
 
   const finish = (ok, msg) => showToast(msg || (ok ? '✅ 导出成功' : '❌ 导出失败，请重试'));
   const fileName = (r.title || 'report').replace(/[\\/:*?"<>|]/g, '_') + '.pdf';
@@ -7040,10 +8198,17 @@ function renderReports(filter = '') {
   let list = reports.filter(r => !filter || r.title.includes(filter) || (r.summary||'').includes(filter));
   // Time filter
   if (reportTimeFilter !== 'all') {
-    const days = parseInt(reportTimeFilter);
-    const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+    let cutoff;
+    if (reportTimeFilter === 'month') {
+      // 本月：自然月（当月 1 日 00:00 起）
+      const now = new Date();
+      cutoff = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+    } else {
+      const days = parseInt(reportTimeFilter) || 0;
+      cutoff = days > 0 ? Date.now() - days * 24 * 60 * 60 * 1000 : 0;
+    }
     list = list.filter(r => {
-      const ts = r.timestamp || new Date(r.time.replace(/-/g,'/')).getTime() || 0;
+      const ts = r.timestamp || new Date(String(r.time || '').replace(/-/g, '/')).getTime() || 0;
       return ts >= cutoff;
     });
   }
@@ -7247,18 +8412,35 @@ function parseDate(v) {
   if (v instanceof Date && isFinite(v)) return v;
   let s = String(v).trim();
   if (!s) return null;
+  // 严格日期校验：拒绝 20260230 / 20261301 这类会被 new Date 滚动到次月的非法日期
+  const validYMD = (y, mo, d) => mo >= 1 && mo <= 12 && d >= 1 && d <= new Date(y, mo, 0).getDate();
   // Chinese date: 2026年7月1日 / 2026年07月01日
   let m = s.match(/^(\d{4})年(\d{1,2})月(\d{1,2})日?/);
-  if (m) return new Date(+m[1], +m[2]-1, +m[3]);
+  if (m && validYMD(+m[1], +m[2], +m[3])) return new Date(+m[1], +m[2]-1, +m[3]);
   // ISO: 2026-07-01 or 2026/7/1
   m = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
-  if (m) return new Date(+m[1], +m[2]-1, +m[3]);
+  if (m && validYMD(+m[1], +m[2], +m[3])) return new Date(+m[1], +m[2]-1, +m[3]);
   // Datetime
   m = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})[T ](\d{1,2}):(\d{2})/);
-  if (m) return new Date(+m[1], +m[2]-1, +m[3], +m[4], +m[5]);
+  if (m && validYMD(+m[1], +m[2], +m[3])) return new Date(+m[1], +m[2]-1, +m[3], +m[4], +m[5]);
   // US: 7/1/2026
   m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if (m) return new Date(+m[3], +m[1]-1, +m[2]);
+  if (m && validYMD(+m[3], +m[1], +m[2])) return new Date(+m[3], +m[1]-1, +m[2]);
+  // Dot-separated: 2026.3.16 / 2026.03.16 (optional time)
+  m = s.match(/^(\d{4})\.(\d{1,2})\.(\d{1,2})(?:[T ](\d{1,2}):(\d{2}))?/);
+  if (m && validYMD(+m[1], +m[2], +m[3])) return new Date(+m[1], +m[2]-1, +m[3], m[4] ? +m[4] : 0, m[5] ? +m[5] : 0);
+  // Compact: 20260317 / 20260317103000 (validity-checked to avoid false positives on plain 8-digit numbers)
+  m = s.match(/^(\d{4})(\d{2})(\d{2})(?:(\d{2})(\d{2})(\d{2}))?$/);
+  if (m && validYMD(+m[1], +m[2], +m[3])) {
+    return new Date(+m[1], +m[2]-1, +m[3], m[4] ? +m[4] : 0, m[5] ? +m[5] : 0, m[6] ? +m[6] : 0);
+  }
+  // D-M-Y / M-D-Y with separators: 15-03-2026 (day-first when first segment > 12)
+  m = s.match(/^(\d{1,2})[-.](\d{1,2})[-.](\d{4})/);
+  if (m) {
+    const a = +m[1], b = +m[2];
+    if (a > 12 && validYMD(+m[3], b, a)) return new Date(+m[3], b-1, a);
+    if (validYMD(+m[3], a, b)) return new Date(+m[3], a-1, b);
+  }
   // Excel serial date
   if (/^\d+(\.\d+)?$/.test(s)) {
     const n = Number(s);
@@ -7423,6 +8605,19 @@ function classifyField(f, allFields, rawData) {
   if (/date|datetime|time|timestamp/.test(f.type)) return 'date';
   if (/date|time|year|month|day|日期|时间|下单|注册|创建|更新|成交|支付日期|支付时间|发货日期|发货时间|生日|月份|年份|季度|周|年|月|日/.test(label)) return 'date';
 
+  // ---- Boolean detection (是/否, true/false, 0/1, 新客/老客) ----
+  if (/是否|与否|是不是|is_|^is$|_is$|bool|boolean|开关|标记|标志/i.test(name) || /是否|与否|是不是|is_|_is$|bool|boolean|开关|标记|标志/i.test(alias)) return 'boolean';
+  if (rawData && rawData.length >= 3) {
+    const boolUniq = [...new Set(rawData.map(v => String(v).trim()).filter(v => v !== ''))];
+    if (boolUniq.length >= 1 && boolUniq.length <= 6) {
+      if (boolUniq.every(v => /^(是|否|true|false|1|0|y|n|yes|no|t|f|对|错|有|无)$/i.test(v))) return 'boolean';
+      if (boolUniq.length === 2) {
+        const BOOL_PAIRS = [['新客','老客'],['新用户','老用户'],['新客户','老客户'],['新会员','老会员'],['有效','无效'],['正常','异常']];
+        if (BOOL_PAIRS.some(([a, b]) => (boolUniq[0] === a && boolUniq[1] === b) || (boolUniq[0] === b && boolUniq[1] === a))) return 'boolean';
+      }
+    }
+  }
+
   // ---- Metric detection (decimal/float types are almost always metrics) ----
   if (/decimal|float|double|number|numeric|money|currency|real/.test(f.type)) return 'metric';
 
@@ -7561,6 +8756,8 @@ function handleFileUpload(e) {
     return;
   }
 
+  const _dmUpStart = Date.now();
+  if (window.DM_TRACK) DM_TRACK.fileUploadStart({ file_name: file.name, file_size_kb: Math.round(file.size/1024), file_format: ext });
   const reader = new FileReader();
   reader.onload = (ev) => {
     try {
@@ -7587,6 +8784,7 @@ function handleFileUpload(e) {
           const cnAlias = inferChineseAlias(rawHeader);
           return {
             name: h || `col_${i+1}`,
+            header: rawHeader,
             alias: cnAlias || rawHeader,
             type: inferType(colValues),
             desc: cnAlias || rawHeader,
@@ -7636,6 +8834,17 @@ function handleFileUpload(e) {
               const n = parseNumeric(val);
               val = n !== null ? n : 0;
             }
+            // 日期列规范化：2026.3.16 / 20260317 / 15-03-2026 等统一为 YYYY-MM-DD[ HH:mm:ss]
+            if (field && /^date$|^datetime$|^timestamp$/i.test(field.type)) {
+              const d = parseDate(val);
+              if (d) {
+                const pad = n => String(n).padStart(2, '0');
+                const ds = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+                val = /time/i.test(field.type)
+                  ? ds + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds())
+                  : ds;
+              }
+            }
             obj[h] = val;
           });
           return obj;
@@ -7665,10 +8874,12 @@ function handleFileUpload(e) {
         return;
       }
 
+      if (window.DM_TRACK) DM_TRACK.fileUploadSuccess({ file_name: file.name, row_count: pendingImport.tables.reduce((a,t)=>a+(t.totalRows||0),0), column_count: (pendingImport.tables[0]&&pendingImport.tables[0].fields?pendingImport.tables[0].fields.length:0), parse_duration_ms: Date.now()-_dmUpStart });
       showImportPreview();
     } catch(err) {
       console.error(err);
       showToast('文件解析失败: ' + err.message);
+      if (window.DM_TRACK) DM_TRACK.fileUploadFail({ file_name: file.name, error_code: 'parse_error', error_reason: (err&&err.message)||'parse_error', file_format: ext });
     }
   };
   reader.readAsArrayBuffer(file);
@@ -7763,12 +8974,18 @@ function confirmImport() {
     }
     const fields = t.fields.map((f, fi) => ({
       name: document.getElementById(`imp-fname-${ti}-${fi}`).value.trim() || f.name,
+      header: f.header,
       type: document.getElementById(`imp-ftype-${ti}-${fi}`).value.trim() || f.type,
       desc: document.getElementById(`imp-fdesc-${ti}-${fi}`).value.trim(),
       pk: document.getElementById(`imp-fpk-${ti}-${fi}`).checked,
       role: f.role
     }));
-    fields.forEach(f => { f.role = classifyField(f, fields); });
+    fields.forEach((f, fi) => {
+      // 用原始列名取该列取值，保证值域型角色（布尔 0/1、新客/老客）在预览改字段后依然识别
+      const origName = t.fields[fi] ? t.fields[fi].name : f.name;
+      const colVals = (t.dataRows || t.sampleRows || []).map(r => r[origName]).filter(v => v !== null && v !== undefined && String(v).trim() !== '');
+      f.role = classifyField(f, fields, colVals);
+    });
     tables[name] = {
       name, alias, group, desc, fields,
       sampleRows: t.sampleRows, dataRows: t.dataRows || t.sampleRows,
@@ -7777,8 +8994,7 @@ function confirmImport() {
     added++;
   });
   if (added === 0) { showToast('未导入任何表'); return; }
-  // Real data imported — switch to real mode, remove demo tables
-  demoViewActive = false;
+  // Real data imported — remove demo tables
   purgeDefaultData();
   saveTables(tables);
   closeImportModal();
@@ -8175,9 +9391,8 @@ function closeProfileDropdown() {
 }
 function updatePDStats() {
   const el = document.getElementById('pdTableCount');
-  // Demo tables are now permanent and always queryable, so count all tables
-  // (demo + user-uploaded) — this matches the chat badge "3 张表".
-  if (el) el.textContent = Object.keys(tables).length + ' 张';
+  // Count user-uploaded tables only — demo/sample tables don't count
+  if (el) el.textContent = Object.values(tables).filter(t => !t.isDefault).length + ' 张';
 }
 // Close dropdown when clicking outside
 document.addEventListener('click', function(e) {
@@ -8242,8 +9457,9 @@ document.addEventListener('drop', e => {
    Init
    ============================================================ */
 recordProductEvent('page_view', { status: 'success', table_count: Object.keys(tables).length });
-// Start on the REAL home: no demo tables on load. The 3 sample tables only
-// appear after the user explicitly enters 体验模式 (查看推荐问题 →).
+if (window.DM_TRACK) DM_TRACK.pageView({ status: 'success', table_count: Object.keys(tables).length });
+// Start on the single main page: no demo tables on load. The 3 sample tables
+// only appear after the user clicks a demo metric card or asks a question.
 Object.keys(tables).forEach(k => { if (tables[k].isDefault) delete tables[k]; });
 saveTables(tables);
 updateDSBadge();
@@ -8268,14 +9484,12 @@ renderReports();
   <div class="pd-section">
     <div class="pd-title">使用统计</div>
     <div class="pd-row"><span>已配置表</span><b id="pdTableCount">0 张</b></div>
-    <div class="pd-row"><span>数据安全</span><b style="color:var(--success);">本地存储 ✓</b></div>
+    <div class="pd-row"><span>数据安全</span><b style="color:var(--success)">本地存储 ✓</b></div>
   </div>
   <div class="pd-section pd-section-border">
-    <button class="pd-danger-btn" onclick="if(confirm('确认清除所有本地数据？包括已上传的表和对话历史')){localStorage.removeItem('databrain_tables');localStorage.removeItem('databrain_conversations');localStorage.removeItem('databrain_current_conv');tables={};conversations={};currentConvId=null;saveTables(tables);saveConversations();renderDSTable();renderChatEmpty(true);renderDictPage();renderReports();renderConvList();updatePDStats();closeProfileDropdown();ensureConversation();showToast('已清除所有本地数据');location.reload();}">清除所有本地数据</button>
+    <button class="pd-danger-btn" onclick="if(confirm('确认清除所有本地数据？包括已上传的表、对话历史和意见反馈')){localStorage.removeItem('databrain_tables');localStorage.removeItem('databrain_conversations');localStorage.removeItem('databrain_current_conv');localStorage.removeItem('databrain_feedback');tables={};conversations={};currentConvId=null;saveTables(tables);saveConversations();showToast('已清除所有本地数据');location.reload();}">清除所有本地数据</button>
   </div>
 </div>
-
-
 
 
 <!-- 飞书日志接入 -->
@@ -8302,9 +9516,7 @@ renderReports();
   /* ============================================================
    * 配置区
    * ============================================================ */
-  // 地址从 js/config.js 读取（不入库）；未配置时日志功能自动关闭
-  const FEISHU_WEBHOOK_URL =
-    (window.DATABRAIN_CONFIG && window.DATABRAIN_CONFIG.feishuWebhook) || '';
+  const FEISHU_WEBHOOK_URL = (window.DATABRAIN_CONFIG && window.DATABRAIN_CONFIG.feishuWebhook) || '';
   const LOGGER_VERSION = 'feishu-logger-v1.0';
   const FEISHU_RATE_LIMIT_MS = 200; // 飞书限速：5条/秒，这里保守用 200ms 间隔
   const MAX_SQL_LENGTH = 2000;     // SQL 最长截断长度
@@ -8338,7 +9550,7 @@ renderReports();
   let lastTableName = '';        // 最近使用的数据表
   let sendQueue = [];            // 发送队列（用于限速）
   let isSending = false;        // 是否正在发送
-  let feishuEnabled = true;      // 日志开关
+  let feishuEnabled = Boolean(FEISHU_WEBHOOK_URL);      // 日志开关
   let loggerInstalled = false;   // 安装状态
 
   /* ============================================================
@@ -8394,21 +9606,69 @@ renderReports();
   /* ============================================================
    * 飞书消息卡片构建
    * ============================================================ */
+  /* ============================================================
+   * 用户动作白话描述（让飞书日志一眼看懂"用户干了什么"）
+   * ============================================================ */
+  function describeAction(eventType, info) {
+    const q = info.query || lastQueryText || '';
+    switch (eventType) {
+      case 'page_view':
+        return '📄 用户打开了数据分析页面';
+      case 'query_submitted':
+        return '💬 用户提问：' + (info.query || '(空问题)');
+      case 'sql_generated':
+        return q ? ('🔧 系统为「' + q + '」生成了分析方案') : '🔧 系统生成了分析方案';
+      case 'sql_regenerated':
+        return '🔄 系统重新生成了分析方案';
+      case 'sql_confirmed':
+        return '✅ 用户确认了分析方案';
+      case 'analysis_completed':
+        return '📊 分析完成，已生成可视化图表';
+      case 'chart_rendered':
+        return (info.status === 'failed' ? '📉 图表渲染失败' : '📈 图表渲染成功') +
+          (info.chart_type ? '（' + info.chart_type + '）' : '');
+      case 'feedback_submitted':
+        if (info.feedback === 'like') return '👍 用户评价：有用';
+        if (info.feedback === 'dislike') {
+          const r = info.feedback_reasons ? '（原因：' + info.feedback_reasons + '）' : '';
+          return '👎 用户评价：无用' + r;
+        }
+        return '🗣️ 用户提交了反馈';
+      case 'file_uploaded':
+        return '📎 用户上传了数据文件：' + (info.fileName || info.query || lastUploadedFileName || '(未知文件名)');
+      case 'client_error':
+        return '❌ 页面发生错误：' + (info.error_code || '未知错误');
+      case 'telemetry_enabled':
+        return '⚙️ 遥测开关切换：' + (info.status === 'enabled' ? '已开启' : '已关闭');
+      default:
+        const c = EVENT_CONFIG[eventType] || DEFAULT_CONFIG;
+        return c.emoji + ' ' + c.label;
+    }
+  }
+
+  /* ============================================================
+   * 飞书消息卡片构建
+   * ============================================================ */
   function buildCard(eventType, info) {
     const config = EVENT_CONFIG[eventType] || DEFAULT_CONFIG;
     const isError = info.status === 'failed' || eventType === 'client_error';
     const cardColor = isError ? 'red' : config.color;
 
+    const actionText = describeAction(eventType, info);
+
     // 构建字段列表（使用 lark_md 格式）
     const fields = [];
 
+    // —— 用户动作（人话，放在最前面）——
+    fields.push({ name: '用户动作', value: actionText });
+
     // —— 必填字段 ——
     fields.push({ name: '时间', value: formatTime() });
-    fields.push({ name: '事件', value: config.emoji + ' ' + config.label });
+    fields.push({ name: '事件类型', value: eventType });
     fields.push({ name: '页面版本', value: getAppVersion() + ' | ' + LOGGER_VERSION });
 
-    // —— 用户问题 ——
-    if (info.query) {
+    // —— 用户问题（提问事件已在"用户动作"中体现，避免重复）——
+    if (info.query && eventType !== 'query_submitted') {
       fields.push({ name: '用户问题', value: truncate(info.query, MAX_QUERY_LENGTH) });
     }
 
@@ -8471,8 +9731,16 @@ renderReports();
     if (info.feedback) {
       fields.push({
         name: '用户反馈',
-        value: info.feedback === 'like' ? '👍 有用' : '👎 无用',
+        value: info.feedback === 'like' ? '👍 有用' : (info.feedback === 'dislike' ? '👎 无用' : info.feedback),
       });
+    }
+
+    // —— 不满意原因 / 意见详情（差评浮层收集）——
+    if (info.feedback_reasons) {
+      fields.push({ name: '不满意原因', value: truncate(info.feedback_reasons, 200) });
+    }
+    if (info.feedback_comment) {
+      fields.push({ name: '意见详情', value: truncate(info.feedback_comment, 500) });
     }
 
     // —— Session ID ——
@@ -8492,15 +9760,13 @@ renderReports();
     // 分隔线
     elements.push({ tag: 'hr' });
 
-    // 构建卡片
+    // 构建卡片（标题直接用人话动作，一眼看懂）
     const card = {
       config: { wide_screen_mode: true, enable_forward: true },
       header: {
         title: {
           tag: 'plain_text',
-          content:
-            'DataBrain日志 | ' + config.label +
-            (info.query ? ' | ' + truncate(info.query, 30) : ''),
+          content: truncate('DataBrain | ' + actionText, 60),
         },
         template: cardColor,
       },
@@ -8632,7 +9898,7 @@ renderReports();
         if (file) {
           lastUploadedFileName = file.name;
           sendToFeishu('file_uploaded', {
-            query: file.name,
+            fileName: file.name,
             status: 'success',
             table_count: typeof tables !== 'undefined' ? Object.keys(tables).length : 0,
           });
@@ -8653,7 +9919,7 @@ renderReports();
           if (file) {
             lastUploadedFileName = file.name;
             sendToFeishu('file_uploaded', {
-              query: file.name,
+              fileName: file.name,
               status: 'success',
               table_count: typeof tables !== 'undefined' ? Object.keys(tables).length : 0,
             });
@@ -8743,47 +10009,129 @@ renderReports();
 </script>
 
 <script>
+var TRACK_URL = (window.DATABRAIN_CONFIG && window.DATABRAIN_CONFIG.trackEnabled === true && window.DATABRAIN_CONFIG.trackUrl) ? window.DATABRAIN_CONFIG.trackUrl : "";
+function getSessionId() {
+  return getUnifiedSessionId();
+}
+// 从被点击元素提取标识信息（定位用户点了哪个按钮/区域）
+function getClickElementInfo(el) {
+  if (!el) return {};
+  var id = el.id || '';
+  var tag = el.tagName ? el.tagName.toLowerCase() : '';
+  var track = el.getAttribute ? (el.getAttribute('data-track') || '') : '';
+  var action = el.getAttribute ? (el.getAttribute('onclick') || '').slice(0, 80) : '';
+  var text = (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 50);
+  var cls = (el.className && typeof el.className === 'string') ? el.className.trim().split(/\s+/).slice(0, 3).join('.') : '';
+  return { id: id, tag: tag, track: track, action: action, text: text, cls: cls };
+}
+// 全局点击上报（携带元素标识）
+document.addEventListener("click", function(e){
+  try {
+    var t = e.target;
+    var el = (t && t.closest) ? t.closest('[data-track],[id],button,a,input,[role="button"],.btn,.action-btn,[onclick]') : t;
+    var info = getClickElementInfo(el || t);
+    var sendData = {
+      user_id: "demo_user_01",
+      event_name: "page_click",
+      page: "/index.html",
+      device: "pc",
+      payload: {
+        session_id: getSessionId(),
+        element_id: info.id || '',
+        element_tag: info.tag || '',
+        element_track: info.track || '',
+        element_action: info.action || '',
+        element_text: info.text || '',
+        element_cls: info.cls || ''
+      }
+    };
+    if (TRACK_URL) fetch(TRACK_URL, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(sendData)
+    }).then(function(r){return r.json();}).then(function(ret){
+      console.log("埋点上报成功",ret);
+    }).catch(function(err){
+      console.error("埋点上报失败",err);
+    });
+  } catch (err) {}
+})
+</script>
+
+<script>
 /* ============================================================
- * 行为埋点（可配置）
- * 地址与开关从 js/config.js 读取；未配置时完全不上报。
- * 点击事件做 3 秒节流，避免频繁请求。
+ * DataMind AI · 产品全链路埋点（8 阶段）
+ * 统一上报到后端 TRACK_URL（与 page_click 同一接口 /api/track）
+ * 事件 schema: { user_id, event_name, page, device, payload:{ session_id, ... } }
+ * 业务代码调用：window.DM_TRACK.<事件方法>({...})
  * ============================================================ */
 (function () {
-  const cfg = window.DATABRAIN_CONFIG || {};
-  const TRACK_URL = cfg.trackUrl || '';
-  const TRACK_ENABLED = !!(cfg.trackEnabled && TRACK_URL);
-  if (!TRACK_ENABLED) return;
+  'use strict';
+  var TRACK_URL = (window.DATABRAIN_CONFIG && window.DATABRAIN_CONFIG.trackEnabled === true && window.DATABRAIN_CONFIG.trackUrl) ? window.DATABRAIN_CONFIG.trackUrl : "";
+  var USER_ID = "demo_user_01";
 
-  function getSessionId() {
-    let sid = localStorage.getItem('sid');
-    if (!sid) {
-      sid = Math.random().toString(36).slice(2);
-      localStorage.setItem('sid', sid);
-    }
-    return sid;
+  function getDMDevice() {
+    var ua = navigator.userAgent || '';
+    if (/Mobile|Android|iPhone|iPod/i.test(ua)) return 'mobile';
+    if (/iPad|Tablet/i.test(ua)) return 'tablet';
+    return 'pc';
+  }
+    function getDMSessionId() {
+    return getUnifiedSessionId();
+  }
+  // 页面进入时间，用于 session_end 计算停留时长；DM_LAST_STEP 记录最后停留步骤
+  var DM_PAGE_ENTER = Date.now();
+  var DM_LAST_STEP = 'page_view';
+  window.DM_SET_LAST_STEP = function (s) { if (s) DM_LAST_STEP = s; };
+
+  function dmTrack(eventName, payload) {
+    if (!TRACK_URL) return;
+    try {
+      var data = {
+        user_id: USER_ID,
+        event_name: eventName,
+        page: "/index.html",
+        device: getDMDevice(),
+        payload: Object.assign({ session_id: getDMSessionId() }, payload || {})
+      };
+      var body = JSON.stringify(data);
+      // 优先 sendBeacon（页面关闭时也能可靠发出），失败回退 fetch
+      if (navigator.sendBeacon) {
+        try { if (navigator.sendBeacon(TRACK_URL, new Blob([body], { type: 'application/json' }))) return; } catch (e) {}
+      }
+      fetch(TRACK_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: body }).catch(function () {});
+    } catch (e) {}
   }
 
-  let lastSent = 0;
-  const THROTTLE_MS = 3000;
-  document.addEventListener('click', function () {
-    const now = Date.now();
-    if (now - lastSent < THROTTLE_MS) return;
-    lastSent = now;
-    const sendData = {
-      user_id: 'demo_user_01',
-      event_name: 'page_click',
-      page: location.pathname,
-      device: 'pc',
-      payload: { session_id: getSessionId(), msg: '页面点击事件' }
-    };
-    fetch(TRACK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(sendData)
-    }).catch(function (err) { console.warn('埋点上报失败', err); });
-  });
+  // 阶段 8：离开会话
+  function dmSessionEnd() {
+    var dur = Math.round((Date.now() - DM_PAGE_ENTER) / 1000);
+    dmTrack('session_end', { session_duration_sec: dur, last_step: DM_LAST_STEP });
+  }
+  window.addEventListener('pagehide', dmSessionEnd);
+  window.addEventListener('beforeunload', dmSessionEnd);
+
+  // 暴露给业务代码调用的埋点接口
+  window.DM_TRACK = {
+    pageView:          function (p) { DM_SET_LAST_STEP('page_view'); dmTrack('page_view', p || {}); },
+    fileUploadStart:   function (p) { DM_SET_LAST_STEP('upload');    dmTrack('file_upload_start', p || {}); },
+    fileUploadSuccess: function (p) { DM_SET_LAST_STEP('upload');    dmTrack('file_upload_success', p || {}); },
+    fileUploadFail:    function (p) { DM_SET_LAST_STEP('upload');    dmTrack('file_upload_fail', p || {}); },
+    querySubmit:       function (p) { DM_SET_LAST_STEP('question');  dmTrack('query_submit', p || {}); },
+    sqlGenerated:      function (p) { DM_SET_LAST_STEP('sql');       dmTrack('sql_generated', p || {}); },
+    sqlConfirm:        function (p) { DM_SET_LAST_STEP('confirm');   dmTrack('sql_confirm', p || {}); },
+    sqlReject:         function (p) { DM_SET_LAST_STEP('confirm');   dmTrack('sql_reject', p || {}); },
+    analysisSuccess:   function (p) { DM_SET_LAST_STEP('analysis');  dmTrack('analysis_success', p || {}); },
+    analysisFail:      function (p) { DM_SET_LAST_STEP('analysis');  dmTrack('analysis_fail', p || {}); },
+    resultExport:      function (p) { DM_SET_LAST_STEP('consume');   dmTrack('result_export', p || {}); },
+    resultCopy:        function (p) { DM_SET_LAST_STEP('consume');   dmTrack('result_copy', p || {}); },
+    chartFeedback:     function (p) { DM_SET_LAST_STEP('consume');   dmTrack('chart_feedback', p || {}); },
+    queryUnrecognized: function (p) { DM_SET_LAST_STEP('question');  dmTrack('query_unrecognized', p || {}); },
+    sqlExecuteFail:    function (p) { DM_SET_LAST_STEP('sql');       dmTrack('sql_execute_fail', p || {}); },
+    sqlExecuteSuccess: function (p) { DM_SET_LAST_STEP('sql');       dmTrack('sql_execute_success', p || {}); },
+    track: dmTrack
+  };
 })();
 </script>
 
 </body></html>
-

@@ -1,5 +1,7 @@
-# 运行时环境配置（含 webhook / 服务器地址，禁止入库）
+# 运行时环境配置（含 Webhook / 服务器地址，禁止入库）
 js/config.js
+.env
+.env.local
 
 # 系统与编辑器文件
 .DS_Store
@@ -10,3 +12,14 @@ Thumbs.db
 # 日志与临时文件
 *.log
 *.tmp
+.tmp/
+.cache/
+
+# 构建与测试产物
+dist/
+build/
+coverage/
+_shots/
+
+# 依赖目录（当前 vendor 已入库以支持离线运行，此处忽略用户自行安装的 Node 依赖）
+node_modules/
