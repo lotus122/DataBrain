@@ -3,7 +3,7 @@
 <meta charset="UTF-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>DataBrain — AI 数据分析平台 Demo</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%234f46e5'/%3E%3Cpath d='M18 42V22h7l7 12 7-12h7v20h-7V32l-7 11-7-11v10z' fill='white'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%234f46e5'/%3E%3Ctext x='32' y='43' font-size='34' text-anchor='middle' fill='white' font-family='Arial'%3ED%3C/text%3E%3C/svg%3E">
 <style>
 /* ============================================================
    CSS Variables & Design System
@@ -508,6 +508,58 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
 .forward-menu-path span { color: var(--accent); font-family: var(--mono); }
 .chart-inline { width: 100%; height: 520px; min-height: 520px; margin: 16px 0; display: block; overflow: visible !important; }
 
+/* ===== PDF 导出进度浮层 ===== */
+.pdf-progress-mask {
+  position: fixed; inset: 0; z-index: 3000;
+  background: rgba(15, 23, 42, 0.5);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity .2s ease;
+}
+.pdf-progress-mask.show { opacity: 1; }
+.pdf-progress-card {
+  width: min(430px, 92vw); background: var(--bg2);
+  border-radius: 16px; padding: 22px 22px 18px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+  transform: translateY(10px) scale(0.98);
+  transition: transform .24s cubic-bezier(.2, .8, .3, 1);
+}
+.pdf-progress-mask.show .pdf-progress-card { transform: none; }
+.pdf-progress-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.pdf-progress-badge {
+  width: 40px; height: 40px; flex: 0 0 40px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+  color: #1e3a8a; font-size: 18px; font-weight: 800;
+}
+.pdf-progress-badge.ok { background: linear-gradient(135deg, #ecfdf5, #d1fae5); color: #059669; }
+.pdf-progress-badge.fail { background: linear-gradient(135deg, #fef2f2, #fee2e2); color: #dc2626; }
+.pdf-spinner {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2.5px solid rgba(30, 58, 138, 0.18); border-top-color: #1e3a8a;
+  animation: pdfSpin .8s linear infinite;
+}
+.pdf-progress-card.done .pdf-spinner, .pdf-progress-card.fail .pdf-spinner { display: none; }
+@keyframes pdfSpin { to { transform: rotate(360deg); } }
+.pdf-progress-title { font-size: 15px; font-weight: 700; color: var(--ink); }
+.pdf-progress-sub {
+  font-size: 12px; color: var(--muted); margin-top: 2px;
+  max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.pdf-progress-bar { height: 8px; border-radius: 99px; background: #eef2f7; overflow: hidden; }
+.pdf-progress-fill {
+  height: 100%; width: 0; border-radius: 99px;
+  background: linear-gradient(90deg, #3b82f6, #1e3a8a);
+  transition: width .3s ease;
+}
+.pdf-progress-card.fail .pdf-progress-fill { background: linear-gradient(90deg, #f87171, #dc2626); }
+.pdf-progress-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 10px; font-size: 12px; color: var(--muted);
+}
+.pdf-progress-pct { font-variant-numeric: tabular-nums; font-weight: 600; color: #1e3a8a; }
+.pdf-progress-actions { display: flex; justify-content: flex-end; margin-top: 14px; }
+
 /* ===== Professional Data Analysis Report (Feishu Template Style) ===== */
 .report-section { margin-top: 20px; }
 .report-section-title {
@@ -982,30 +1034,24 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
    Responsive
    ============================================================ */
 @media (max-width: 768px) {
-  .sidebar { width: 64px; min-width: 64px; }
-  .sidebar-logo { justify-content: center; padding: 16px 8px; }
-  .sidebar .logo-text, .sidebar .logo-ver, .sidebar .nav-section, .sidebar .user-info, .conv-section, .nav-badge { display: none; }
-  .sidebar-footer { padding: 10px 8px; }
-  .avatar-btn { justify-content: center; }
-  .nav-item { justify-content: center; padding: 12px 8px; margin: 2px 8px; font-size: 0; }
-  .nav-item .nav-icon { font-size: 18px; }
+  input[type=text], input[type=email], input[type=password], input[type=search], textarea, select {
+    font-size: 16px !important;
+  }
+  .sidebar { width: 60px; min-width: 60px; }
+  .sidebar .logo-text, .sidebar .logo-ver, .sidebar .nav-section, .sidebar .user-info { display: none; }
+  .nav-item { justify-content: center; padding: 12px 0; font-size: 0; }
+  .nav-item .nav-icon { width: auto; margin: 0; font-size: 18px; }
+  .conv-section-title, .conv-empty { display: none; }
+  .metric-cards { grid-template-columns: 1fr; max-width: 100%; }
   .dict-layout { flex-direction: column; }
   .dict-sidebar { width: 100%; min-width: auto; }
   .ds-panels { grid-template-columns: 1fr; }
   .report-grid { grid-template-columns: 1fr; }
   .profile-grid { grid-template-columns: 1fr; }
-  .metric-cards { grid-template-columns: 1fr; max-width: 100%; }
-  .demo-questions-table { max-width: 100%; }
-  .empty-upload-area { padding: 28px 18px; }
-  .page-header { padding: 14px 16px; }
-  .page-header h1 { font-size: 18px; }
   .page-content { padding: 16px; }
   .msg { max-width: 95%; }
   .form-row { grid-template-columns: 1fr; }
   .field-row { grid-template-columns: 1fr 80px 1fr auto; }
-  input[type="text"], input[type="email"], input[type="password"], input[type="search"], input:not([type]), textarea, select {
-    font-size: 16px !important;
-  }
 }
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -1324,28 +1370,27 @@ input:focus, textarea:focus, select:focus { border-color: var(--accent); }
 <!-- Netlify detects this form at deploy time and stores anonymous product events
      in the authenticated site dashboard. The user's uploaded dataset is never posted. -->
 <form hidden method="post" name="databrain-product-events">
-  <input name="form-name" value="databrain-product-events">
-  <input name="bot-field">
-  <input name="event_type">
-  <input name="event_id">
-  <input name="session_id">
-  <input name="query_id">
-  <input name="timestamp">
-  <input name="app_version">
-  <input name="query">
-  <input name="intent">
-  <input name="sql">
-  <input name="status">
-  <input name="duration_ms">
-  <input name="metric">
-  <input name="dimension">
-  <input name="chart_type">
-  <input name="feedback">
-  <input name="error_code">
-  <input name="table_count">
+  <input type="hidden" name="form-name" value="databrain-product-events">
+  <input type="hidden" name="bot-field">
+  <input type="hidden" name="event_type">
+  <input type="hidden" name="event_id">
+  <input type="hidden" name="session_id">
+  <input type="hidden" name="query_id">
+  <input type="hidden" name="timestamp">
+  <input type="hidden" name="app_version">
+  <input type="hidden" name="query">
+  <input type="hidden" name="intent">
+  <input type="hidden" name="sql">
+  <input type="hidden" name="status">
+  <input type="hidden" name="duration_ms">
+  <input type="hidden" name="metric">
+  <input type="hidden" name="dimension">
+  <input type="hidden" name="chart_type">
+  <input type="hidden" name="feedback">
+  <input type="hidden" name="error_code">
+  <input type="hidden" name="table_count">
 </form>
 
-<!-- 第三方依赖（本地 vendor，离线可用；版本与原 CDN 一致） -->
 <script src="vendor/echarts.min.js"></script>
 <script src="vendor/xlsx.full.min.js"></script>
 <script src="vendor/html2canvas.min.js"></script>
@@ -7429,6 +7474,547 @@ function toggleFullReport(btn, reportId, tableId) {
   }
 }
 
+/* ============================================================
+   PDF 导出引擎 v7
+   —— 真实下载（不再依赖打印弹窗）+ 逐块分页（卡片/表格不跨页截断）
+   —— 分页进度浮层（解析 → 分页 → 逐页渲染 → 打包 → 下载）
+   ============================================================ */
+const PDF_A4 = { w: 794, h: 1123, mx: 44, foot: 44, scale: 2.5 };
+let _pdfBusy = false;
+
+function _pdfEsc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+  });
+}
+function _pdfSleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+function _pdfCanRender() { return !!(window.html2canvas && window.jspdf && window.jspdf.jsPDF); }
+function _pdfSafeName(s) { return String(s || 'report').replace(/[\\/:*?"<>|]/g, '_').slice(0, 80); }
+
+/* ---------- 进度浮层 ---------- */
+function _pdfProgress(title) {
+  const mask = document.createElement('div');
+  mask.className = 'pdf-progress-mask';
+  mask.innerHTML =
+    '<div class="pdf-progress-card" role="dialog" aria-modal="true">' +
+      '<div class="pdf-progress-head">' +
+        '<div class="pdf-progress-badge"><span class="pdf-spinner"></span></div>' +
+        '<div style="min-width:0;">' +
+          '<div class="pdf-progress-title">正在导出 PDF</div>' +
+          '<div class="pdf-progress-sub">' + _pdfEsc(title) + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="pdf-progress-bar"><div class="pdf-progress-fill"></div></div>' +
+      '<div class="pdf-progress-foot"><span class="pdf-progress-step">准备中…</span><span class="pdf-progress-pct">0%</span></div>' +
+      '<div class="pdf-progress-actions"><button type="button" class="btn btn-outline btn-sm" data-pdf-cancel>取消</button></div>' +
+    '</div>';
+  document.body.appendChild(mask);
+  requestAnimationFrame(function () { mask.classList.add('show'); });
+
+  const fill = mask.querySelector('.pdf-progress-fill');
+  const stepEl = mask.querySelector('.pdf-progress-step');
+  const pctEl = mask.querySelector('.pdf-progress-pct');
+  const badge = mask.querySelector('.pdf-progress-badge');
+  const titleEl = mask.querySelector('.pdf-progress-title');
+  const cancelBtn = mask.querySelector('[data-pdf-cancel]');
+  let cancelled = false;
+  let settled = false;
+
+  const api = {
+    get cancelled() { return cancelled; },
+    step: function (text, pct) {
+      if (cancelled) return;
+      if (text) stepEl.textContent = text;
+      if (typeof pct === 'number') {
+        const p = Math.max(0, Math.min(100, pct));
+        fill.style.width = p + '%';
+        pctEl.textContent = Math.round(p) + '%';
+      }
+    },
+    done: function (msg) {
+      if (cancelled) return;
+      settled = true;
+      mask.querySelector('.pdf-progress-card').classList.add('done');
+      titleEl.textContent = '导出完成';
+      badge.classList.add('ok');
+      badge.innerHTML = '✓';
+      fill.style.width = '100%';
+      pctEl.textContent = '100%';
+      stepEl.textContent = msg || '已保存到下载目录';
+      cancelBtn.textContent = '完成';
+      cancelBtn.className = 'btn btn-primary btn-sm';
+      setTimeout(function () { if (!cancelled) api.close(); }, 1500);
+    },
+    fail: function (msg) {
+      if (cancelled) return;
+      settled = true;
+      mask.querySelector('.pdf-progress-card').classList.add('fail');
+      titleEl.textContent = '导出失败';
+      badge.classList.add('fail');
+      badge.innerHTML = '!';
+      fill.style.width = '100%';
+      stepEl.textContent = msg || '请稍后重试';
+      cancelBtn.textContent = '关闭';
+      cancelBtn.className = 'btn btn-outline btn-sm';
+    },
+    close: function () {
+      mask.classList.remove('show');
+      setTimeout(function () { if (mask.parentNode) mask.remove(); }, 240);
+    }
+  };
+
+  cancelBtn.addEventListener('click', function () {
+    if (cancelBtn.textContent === '取消') {
+      cancelled = true;
+      api.close();
+      showToast('已取消导出');
+    } else {
+      api.close();
+    }
+  });
+  api._settled = function () { return settled; };
+  return api;
+}
+
+/* ---------- 报表导出内容的补充样式（作用域限定，不污染页面） ---------- */
+function _pdfEnsureDocCSS() {
+  if (document.getElementById('pdfDocScopedCSS')) return;
+  const st = document.createElement('style');
+  st.id = 'pdfDocScopedCSS';
+  st.textContent = [
+    '.pdf-doc .summary{margin:2px 0 8px;padding:12px 14px;background:#f8fafc;border-left:4px solid #2563eb;border-radius:8px;font-size:13px;line-height:1.75;color:#334155;}',
+    '.pdf-doc .summary b{color:#1e3a8a;}',
+    '.pdf-doc .sec-title{font-size:13px;font-weight:700;color:#1e3a8a;margin:6px 0 6px;letter-spacing:.4px;border-bottom:1px solid #e8edf5;padding-bottom:5px;}',
+    '.pdf-doc .bars{padding:4px 0;}',
+    '.pdf-doc table{width:100%;border-collapse:collapse;font-size:12.5px;}',
+    '.pdf-doc thead th{background:#1e3a8a;color:#fff;padding:9px 12px;text-align:left;font-weight:600;}',
+    '.pdf-doc thead th.num{text-align:right;}',
+    '.pdf-doc tbody td{border-bottom:1px solid #e5e7eb;}',
+    '.pdf-doc tfoot td{padding:9px 12px;border-top:2px solid #1e3a8a;font-weight:700;background:#eff6ff;}',
+    '.pdf-doc tfoot td.num{text-align:right;}',
+    '.pdf-doc .chip{display:inline-block;font-size:11px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;padding:3px 9px;border-radius:999px;margin:0 6px 6px 0;}'
+  ].join('\n');
+  document.head.appendChild(st);
+}
+
+/* ---------- 原子块拆分：把报告拆成「不会被拦腰截断」的单元 ---------- */
+function _pdfAtomicBlocks(root, skipTitle) {
+  const SKIP = '.report-popup-close, .table-collapse-toggle, .pdf-no-export, .brandbar, .foot, script, style' +
+    (skipTitle ? ', h1, .meta' : '');
+  const EXPLODE = ['full-report-section', 'wrap', 'doc-content'];
+  const blocks = [];
+
+  const cleanClone = function (el) {
+    const c = el.cloneNode(true);
+    if (c.querySelectorAll) {
+      [].forEach.call(c.querySelectorAll(SKIP), function (n) { if (n.parentNode) n.parentNode.removeChild(n); });
+    }
+    return c;
+  };
+
+  const visit = function (el) {
+    if (!el || el.nodeType !== 1) return;
+    if (el.matches && el.matches(SKIP)) return;
+    const cls = el.classList;
+    // 章节：拆开，并在章节之间补一段固定间距（避免标题贴着上一章）
+    if (cls && cls.contains('report-section')) {
+      if (blocks.length) {
+        const gap = document.createElement('div');
+        gap.className = 'pdf-gap';
+        gap.style.cssText = 'height:16px;';
+        blocks.push(gap);
+      }
+      [].forEach.call(el.children, visit);
+      return;
+    }
+    if (cls && EXPLODE.some(function (c) { return cls.contains(c); })) {
+      [].forEach.call(el.children, visit);
+      return;
+    }
+    if (el.tagName === 'TABLE') {
+      blocks.push(cleanClone(el));
+      return;
+    }
+    if ((el.tagName === 'UL' || el.tagName === 'OL') && el.children.length > 5) {
+      [].forEach.call(el.children, function (li) { blocks.push(li.cloneNode(true)); });
+      return;
+    }
+    blocks.push(cleanClone(el));
+  };
+
+  [].forEach.call(root.children, visit);
+  return blocks;
+}
+
+/* ---------- 页面骨架（页眉/页脚/正文容器） ---------- */
+function _pdfPageShell(pageNo, total, meta) {
+  const W = PDF_A4.w, H = PDF_A4.h, MX = PDF_A4.mx;
+  const page = document.createElement('div');
+  page.style.cssText = 'width:' + W + 'px;height:' + H + 'px;background:#fff;position:relative;overflow:hidden;box-sizing:border-box;' +
+    'font-family:"Microsoft YaHei","PingFang SC",-apple-system,"Segoe UI",sans-serif;color:#111827;line-height:1.6;font-size:13px;';
+  const inner = document.createElement('div');
+  inner.style.cssText = 'position:absolute;left:0;top:0;right:0;bottom:0;display:flex;flex-direction:column;box-sizing:border-box;';
+
+  if (pageNo === 1) {
+    inner.innerHTML =
+      '<div style="background:linear-gradient(90deg,#1e3a8a,#2563eb);color:#fff;padding:12px 22px;display:flex;align-items:center;' +
+        'justify-content:space-between;box-sizing:border-box;">' +
+        '<div style="font-size:17px;font-weight:800;letter-spacing:.4px;">Data<span style="color:#facc15;">Brain</span></div>' +
+        '<div style="font-size:11px;opacity:.9;letter-spacing:.5px;">智能数据分析 · 完整报告</div>' +
+      '</div>' +
+      '<div style="padding:16px ' + MX + 'px 0;box-sizing:border-box;">' +
+        '<div style="font-size:22px;font-weight:800;color:#0f172a;line-height:1.35;">' + _pdfEsc(meta.title) + '</div>' +
+        '<div style="margin-top:8px;font-size:11px;color:#6b7280;">生成时间：' + _pdfEsc(meta.time) +
+          (meta.source ? '　|　数据源：' + _pdfEsc(meta.source) : '') + '</div>' +
+      '</div>';
+  } else {
+    inner.innerHTML =
+      '<div style="padding:11px ' + MX + 'px 7px;display:flex;align-items:center;justify-content:space-between;' +
+        'border-bottom:1px solid #e8edf5;box-sizing:border-box;">' +
+        '<div style="font-size:12px;font-weight:800;color:#1e3a8a;letter-spacing:.4px;">Data<span style="color:#d97706;">Brain</span></div>' +
+        '<div style="font-size:10px;color:#9ca3af;max-width:460px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' +
+          _pdfEsc(meta.title) + '</div>' +
+      '</div>';
+  }
+
+  const body = document.createElement('div');
+  body.style.cssText = 'flex:1 1 auto;min-height:0;padding:14px ' + MX + 'px 0;box-sizing:border-box;overflow:hidden;';
+  inner.appendChild(body);
+
+  const foot = document.createElement('div');
+  foot.style.cssText = 'flex:0 0 ' + PDF_A4.foot + 'px;height:' + PDF_A4.foot + 'px;padding:0 ' + MX + 'px;display:flex;' +
+    'align-items:center;justify-content:space-between;border-top:1px solid #eef2f7;font-size:10px;color:#9ca3af;box-sizing:border-box;';
+  foot.innerHTML = '<span>本报告由 DataBrain AI 自动生成 · 数据仅供参考</span>' +
+    '<span style="font-variant-numeric:tabular-nums;">第 ' + pageNo + ' 页 / 共 ' + total + ' 页</span>';
+  inner.appendChild(foot);
+
+  page.appendChild(inner);
+  return { page: page, body: body };
+}
+
+/* ---------- 长表格：可跨页（按行切，表头每页重复） ---------- */
+function _pdfSplitInfo(tbl) {
+  if (!tbl || tbl.tagName !== 'TABLE') return null;
+  const rows = [].slice.call(tbl.querySelectorAll('tbody > tr'));
+  if (rows.length < 4) return null;
+  const heads = [].slice.call(tbl.querySelectorAll('thead > tr'));
+  const footRows = [].slice.call(tbl.querySelectorAll('tfoot > tr'));
+  const hSum = function (list) {
+    return list.reduce(function (a, r) { return a + Math.ceil(r.getBoundingClientRect().height); }, 0);
+  };
+  return {
+    tbl: tbl,
+    heads: heads,
+    footRows: footRows,
+    headH: hSum(heads),
+    footH: hSum(footRows),
+    rows: rows,
+    rowH: rows.map(function (r) { return Math.ceil(r.getBoundingClientRect().height) + 1; })
+  };
+}
+
+function _pdfBuildChunk(su, from, count) {
+  const t = su.tbl.cloneNode(false);
+  if (su.heads.length) {
+    const th = document.createElement('thead');
+    su.heads.forEach(function (h) { th.appendChild(h.cloneNode(true)); });
+    t.appendChild(th);
+  }
+  const tb = document.createElement('tbody');
+  for (let i = from; i < from + count; i++) tb.appendChild(su.rows[i].cloneNode(true));
+  t.appendChild(tb);
+  if (from + count >= su.rows.length && su.footRows.length) {
+    const tf = document.createElement('tfoot');
+    su.footRows.forEach(function (r) { tf.appendChild(r.cloneNode(true)); });
+    t.appendChild(tf);
+  }
+  return t;
+}
+
+/* ---------- 分页装箱 ---------- */
+function _pdfPaginate(units, availFirst, availRest) {
+  const pages = [];
+  let cur = [], used = 0;
+  const queue = units.slice();
+
+  const recalc = function (arr) {
+    let u = 0;
+    arr.forEach(function (x, k) { u += (k ? x.mt : 0) + x.h + x.mb; });
+    return u;
+  };
+  const mkRest = function (su, from) {
+    const rows = su.rows.slice(from);
+    const rowH = su.rowH.slice(from);
+    let h = su.headH + su.footH;
+    rowH.forEach(function (x) { h += x; });
+    return {
+      el: _pdfBuildChunk(su, from, rows.length), h: h, mt: 0, mb: 0, heading: false,
+      splitable: { tbl: su.tbl, heads: su.heads, footRows: su.footRows, headH: su.headH, footH: su.footH, rows: rows, rowH: rowH }
+    };
+  };
+  const flush = function () {
+    // 孤行控制：页尾连续的标题一起带到下一页（不能丢）
+    const carry = [];
+    while (cur.length > 1 && cur[cur.length - 1].heading) carry.unshift(cur.pop());
+    pages.push(cur);
+    cur = carry;
+    used = recalc(cur);
+    return carry;
+  };
+
+  while (queue.length) {
+    const u = queue.shift();
+    const limit = pages.length === 0 ? availFirst : availRest;
+    const add = cur.length ? (u.mt + u.h + u.mb) : (u.h + u.mb);
+
+    if (used + add <= limit) { cur.push(u); used += add; continue; }
+
+    // 长表格：按剩余空间切行，避免整块搬到下一页留下大片空白
+    if (u.splitable && u.splitable.rows.length > 1) {
+      const su = u.splitable;
+      const remain = limit - used;
+      let acc = su.headH, take = 0;
+      for (let r = 0; r < su.rowH.length; r++) {
+        if (acc + su.rowH[r] > remain - 2) break;
+        acc += su.rowH[r];
+        take++;
+      }
+      if (take >= 1 && take < su.rowH.length) {
+        cur.push({ el: _pdfBuildChunk(su, 0, take), h: acc, mt: 0, mb: 0, heading: false });
+        pages.push(cur);
+        cur = []; used = 0;
+        queue.unshift(mkRest(su, take));
+        continue;
+      }
+    }
+
+    if (cur.length) { flush(); cur.push(u); used = recalc(cur); continue; }
+
+    // 空页仍然放不下：独占一页（超大单块兜底）
+    cur.push(u);
+    used = add;
+    pages.push(cur);
+    cur = []; used = 0;
+  }
+  if (cur.length) pages.push(cur);
+  if (!pages.length) pages.push([]);
+  return pages;
+}
+
+/* ---------- 打印兜底（无 html2canvas 时） ---------- */
+function _pdfPrintFallback(opts) {
+  try {
+    const pageStyles = [].map.call(document.querySelectorAll('style'), function (st) { return st.innerHTML; }).join('\n');
+    const body = opts.html || (opts.el ? opts.el.outerHTML : '');
+    const doc = '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>' + _pdfEsc(opts.title) + '</title><style>' +
+      pageStyles + '\n' + _pdfPrintCSS() + '</style></head><body>' +
+      '<div class="pdf-print-brand"><span>Data<b>Brain</b></span><em>智能数据分析 · 完整报告</em></div>' +
+      '<div class="pdf-print-wrap"><h1 class="pdf-print-title">' + _pdfEsc(opts.title) + '</h1>' +
+      '<div class="pdf-print-meta">生成时间：' + _pdfEsc(new Date().toLocaleString('zh-CN')) + '</div>' +
+      body + '</div></body></html>';
+    const w = window.open('', '_blank');
+    if (!w) { showToast('浏览器拦截了新窗口，请允许弹窗后重试'); return; }
+    w.document.open();
+    w.document.write(doc);
+    w.document.close();
+    setTimeout(function () { try { w.focus(); w.print(); } catch (e) {} }, 600);
+  } catch (e) {
+    showToast('导出失败，请重试');
+  }
+}
+
+function _pdfPrintCSS() {
+  return [
+    'body{display:block!important;height:auto!important;overflow:visible!important;background:#fff!important;margin:0!important;}',
+    '.pdf-print-brand{background:linear-gradient(90deg,#1e3a8a,#2563eb);color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;}',
+    '.pdf-print-brand span{font-size:17px;font-weight:800;letter-spacing:.4px;}',
+    '.pdf-print-brand b{color:#facc15;}',
+    '.pdf-print-brand em{font-size:11px;font-style:normal;opacity:.9;}',
+    '.pdf-print-wrap{padding:16px 6mm 0;font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;color:#111827;}',
+    '.pdf-print-title{font-size:22px;font-weight:800;color:#0f172a;margin:0 0 6px;}',
+    '.pdf-print-meta{font-size:11px;color:#6b7280;margin-bottom:8px;}',
+    /* —— 关键：分页规则 —— */
+    '.report-section-title,.report-sub-title,h1,h2,h3,h4{break-after:avoid!important;page-break-after:avoid!important;}',
+    '.report-section{padding-bottom:6px;}',
+    'tr,td,th{break-inside:avoid!important;page-break-inside:avoid!important;}',
+    'thead{display:table-header-group;}',
+    'tfoot{display:table-footer-group;}',
+    '.suggestion-card,.finding-item,.kpi-card,.report-meta-item,.summary,.term-tag{break-inside:avoid!important;page-break-inside:avoid!important;}',
+    'p,li{orphans:3;widows:3;}',
+    'img,canvas,svg{break-inside:avoid!important;}',
+    '.full-report-section{display:block!important;position:static!important;transform:none!important;max-height:none!important;overflow:visible!important;box-shadow:none!important;border-top:none!important;margin:0!important;padding:0!important;background:transparent!important;}',
+    '.report-popup-close,.table-collapse-toggle,.table-hidden-rows,.pdf-no-export{display:none!important;}',
+    '@page{size:A4;margin:12mm;}',
+    '@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}'
+  ].join('\n');
+}
+
+/* ---------- 排版：拆块 → 测量 → 分页（不依赖 canvas，可独立验证） ---------- */
+async function _pdfPrepareLayout(opts, host, meta) {
+  const src = document.createElement('div');
+  if (opts.html) {
+    src.innerHTML = opts.html;
+    _pdfEnsureDocCSS();
+  } else if (opts.el) {
+    src.appendChild(opts.el.cloneNode(true));
+    const sec = src.querySelector('.full-report-section');
+    if (sec) {
+      sec.classList.add('show');
+      sec.classList.remove('report-popup-mode');
+      sec.style.cssText = 'display:block;position:static;transform:none;max-height:none;overflow:visible;' +
+        'box-shadow:none;border-top:none;margin:0;padding:0;background:transparent;width:100%;';
+    }
+  }
+  const blocks = _pdfAtomicBlocks(src, !!opts.html);
+  if (!blocks.length) throw new Error('empty');
+  if (opts.html) [].forEach.call(blocks, function (b) { b.classList.add('pdf-doc'); });
+
+  // 逐块测量（宽度 = A4 内容宽度）
+  const flow = document.createElement('div');
+  flow.style.cssText = 'width:' + (PDF_A4.w - PDF_A4.mx * 2) + 'px;background:#fff;';
+  blocks.forEach(function (b) { flow.appendChild(b); });
+  host.innerHTML = '';
+  host.appendChild(flow);
+  await _pdfSleep(40);
+
+  const units = blocks.map(function (b) {
+    const cs = getComputedStyle(b);
+    const mt = parseFloat(cs.marginTop) || 0;
+    const mb = parseFloat(cs.marginBottom) || 0;
+    const h = Math.ceil(b.getBoundingClientRect().height);
+    return {
+      el: b, h: Math.max(h, 1), mt: mt, mb: mb,
+      heading: b.classList.contains('report-section-title') || b.classList.contains('report-sub-title') || b.classList.contains('sec-title') ||
+               /^H[1-4]$/.test(b.tagName),
+      splitable: _pdfSplitInfo(b)
+    };
+  });
+
+  // 用真实骨架量出可用高度
+  host.innerHTML = '';
+  const shell1 = _pdfPageShell(1, 1, meta);
+  host.appendChild(shell1.page);
+  const availFirst = shell1.body.clientHeight - 14 - 8;
+  host.innerHTML = '';
+  const shellN = _pdfPageShell(2, 2, meta);
+  host.appendChild(shellN.page);
+  const availRest = shellN.body.clientHeight - 14 - 8;
+  host.innerHTML = '';
+
+  return _pdfPaginate(units, availFirst, availRest);
+}
+
+/* ---------- 主导出流程 ---------- */
+async function _pdfExport(opts) {
+  if (_pdfBusy) { showToast('正在导出，请稍候…'); return; }
+  const title = opts.title || 'DataBrain 报告';
+  const fileName = opts.fileName || (_pdfSafeName(title) + '.pdf');
+  const meta = {
+    title: title,
+    time: opts.time || new Date().toLocaleString('zh-CN'),
+    source: opts.source || ''
+  };
+
+  if (!_pdfCanRender()) { _pdfPrintFallback(opts); return; }
+
+  _pdfBusy = true;
+  const prog = _pdfProgress(title);
+  const host = document.createElement('div');
+  host.style.cssText = 'position:fixed;left:-99999px;top:0;width:' + PDF_A4.w + 'px;z-index:-1;';
+  document.body.appendChild(host);
+
+  try {
+    if (document.fonts && document.fonts.ready) {
+      // 字体加载最多等 1.2s，避免极端情况下卡死在第一步
+      try { await Promise.race([document.fonts.ready, _pdfSleep(1200)]); } catch (e) {}
+    }
+
+    prog.step('正在解析报告结构…', 8);
+    await _pdfSleep(60);
+
+    const pages = await _pdfPrepareLayout(opts, host, meta);
+
+    prog.step('已分为 ' + pages.length + ' 页，开始逐页渲染…', 24);
+    await _pdfSleep(60);
+
+    const jsPDFCtor = window.jspdf.jsPDF;
+    const pdf = new jsPDFCtor({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
+
+    for (let i = 0; i < pages.length; i++) {
+      if (prog.cancelled) { try { host.remove(); } catch (e) {} _pdfBusy = false; return; }
+      prog.step('正在渲染第 ' + (i + 1) + ' / ' + pages.length + ' 页…', 24 + Math.round(64 * (i / pages.length)));
+      await _pdfSleep(20);
+
+      host.innerHTML = '';
+      const shell = _pdfPageShell(i + 1, pages.length, meta);
+      host.appendChild(shell.page);
+      pages[i].forEach(function (u) { shell.body.appendChild(u.el); });
+      await _pdfSleep(50);
+
+      const canvas = await html2canvas(shell.page, {
+        scale: PDF_A4.scale,
+        backgroundColor: '#ffffff',
+        useCORS: true,
+        logging: false,
+        width: PDF_A4.w,
+        height: PDF_A4.h,
+        windowWidth: PDF_A4.w,
+        scrollX: 0,
+        scrollY: 0
+      });
+      const img = canvas.toDataURL('image/png');
+      if (i > 0) pdf.addPage();
+      pdf.addImage(img, 'PNG', 0, 0, 210, 297);
+    }
+
+    prog.step('正在打包 PDF 文件…', 92);
+    await _pdfSleep(80);
+    pdf.save(fileName);
+    prog.step('已开始下载 ' + fileName, 100);
+    prog.done('已保存：' + fileName);
+  } catch (err) {
+    if (!prog.cancelled) {
+      const msg = String(err && err.message || err);
+      prog.fail(msg === 'empty' ? '报告内容为空' : '生成失败，请重试');
+      // 兜底：退回打印方案
+      if (msg !== 'empty') setTimeout(function () { _pdfPrintFallback(opts); }, 900);
+    }
+  } finally {
+    try { host.remove(); } catch (e) {}
+    _pdfBusy = false;
+  }
+}
+
+/* ---------- 业务入口 ---------- */
+function downloadFullReport(btn, reportId) {
+  const section = document.getElementById(reportId);
+  if (!section) { showToast('未找到完整报告内容'); return; }
+  const card = section.closest('.result-card');
+  const h2 = card ? card.querySelector('h2') : null;
+  let title = (h2 ? h2.textContent : '').replace(/[\u{1F300}-\u{1FAFF}\u2600-\u27BF]/gu, '').replace(/\s+/g, ' ').trim();
+  if (!title) title = 'DataBrain 完整报告';
+  if (window.DM_TRACK && DM_TRACK.resultExport) {
+    try { DM_TRACK.resultExport({ export_format: 'pdf', from: 'full_report' }); } catch (e) {}
+  }
+  _pdfExport({ el: section, title: title, fileName: _pdfSafeName(title) + '.pdf' });
+}
+
+function exportReportPDF(id) {
+  const rid = id || _lastViewedReportId;
+  const r = reports.find(function (x) { return x.id === rid; });
+  if (!r) { showToast('没有可导出的报表'); return; }
+  if (window.DM_TRACK && DM_TRACK.resultExport) {
+    try { DM_TRACK.resultExport({ export_format: 'pdf', from: 'report_library' }); } catch (e) {}
+  }
+  _pdfExport({
+    html: _buildReportExportHTML(r),
+    title: r.title || '数据分析报表',
+    time: r.time || '',
+    source: r.tableAlias || '',
+    fileName: _pdfSafeName(r.title || 'report') + '.pdf'
+  });
+}
+
 // Clone the full-report section for PDF/print export: force visible and strip
 // the popup-mode fixed positioning so the export renders in normal flow.
 function prepareReportClone(section) {
@@ -7441,87 +8027,6 @@ function prepareReportClone(section) {
 
 // Download the expanded full report section as PDF (html2canvas + jsPDF),
 // with a standalone HTML download fallback for print-to-PDF.
-function downloadFullReport(btn, reportId) {
-  const section = document.getElementById(reportId);
-  if (!section) { showToast('未找到完整报告内容'); return; }
-  showToast('⏳ 正在生成 PDF...');
-
-  const finish = (ok, msg) => showToast(msg || (ok ? '✅ 导出成功' : '❌ 导出失败，请重试'));
-
-  // Derive report title from the parent result card heading
-  const card = section.closest('.result-card');
-  const h2 = card ? card.querySelector('h2') : null;
-  let title = (h2 ? h2.textContent : '').replace(/[\u{1F300}-\u{1FAFF}\u2600-\u27BF]/gu, '').replace(/\s+/g, ' ').trim();
-  if (!title) title = 'DataBrain 完整报告';
-  const safeName = title.replace(/[\\/:*?"<>|]/g, '_');
-  const fileName = safeName + '.pdf';
-
-  const runDownloadFallback = () => {
-    try {
-      // Clone the section and inline current page styles so the file is standalone
-      const clone = prepareReportClone(section);
-      const pageStyles = Array.from(document.querySelectorAll('style')).map(s => s.innerHTML).join('\n');
-      const html = '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>' + title + '</title>' +
-        '<style>' + pageStyles + '</style>' +
-        '<style>body{margin:0;background:#fff;padding:24px;}@media print{body{padding:0;}}</style></head><body>' + clone.outerHTML + '</body></html>';
-      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = safeName + '.html';
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
-      finish(true, '✅ 报告已下载，打开文件后 Ctrl+P →「另存为 PDF」即可导出');
-    } catch (e) { finish(false); }
-  };
-
-  const runPrintFallback = () => {
-    try {
-      const w = window.open('', '_blank');
-      if (!w) { runDownloadFallback(); return; }
-      const clone = prepareReportClone(section);
-      const pageStyles = Array.from(document.querySelectorAll('style')).map(s => s.innerHTML).join('\n');
-      w.document.open();
-      w.document.write('<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>' + title + '</title><style>' + pageStyles + '</style><style>body{margin:0;background:#fff;padding:24px;}</style></head><body>' + clone.outerHTML + '</body></html>');
-      w.document.close();
-      setTimeout(() => { try { w.focus(); w.print(); } catch (e) {} finish(true); }, 600);
-    } catch (e) { runDownloadFallback(); }
-  };
-
-  if (window.html2canvas && window.jspdf && window.jspdf.jsPDF) {
-    // Show a styled clone offscreen (page CSS still applies to it) for capture
-    const holder = document.createElement('div');
-    holder.style.position = 'fixed';
-    holder.style.left = '-99999px';
-    holder.style.top = '0';
-    holder.style.width = '794px';
-    holder.style.background = '#ffffff';
-    const clone = prepareReportClone(section);
-    holder.appendChild(clone);
-    document.body.appendChild(holder);
-    html2canvas(holder, { scale: 2, backgroundColor: '#ffffff', useCORS: true }).then(canvas => {
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pageW = 210, pageH = 297, margin = 10;
-      const imgW = pageW - margin * 2;
-      const imgH = canvas.height * imgW / canvas.width;
-      const img = canvas.toDataURL('image/png');
-      const pageContentH = pageH - margin * 2;
-      let offset = 0;
-      while (offset < imgH) {
-        if (offset > 0) pdf.addPage();
-        pdf.addImage(img, 'PNG', margin, margin - offset, imgW, imgH);
-        offset += pageContentH;
-      }
-      try { document.body.removeChild(holder); } catch (e) {}
-      pdf.save(fileName);
-      finish(true);
-    }).catch(() => { try { document.body.removeChild(holder); } catch (e) {} runPrintFallback(); });
-  } else {
-    runPrintFallback();
-  }
-}
-
 /* ============================================================
    Action button handlers (like/dislike/forward/copy)
    ============================================================ */
@@ -7899,103 +8404,98 @@ function exportCurrentReport() {
    ============================================================ */
 let _lastViewedReportId = null;
 
+function _reportExportCSS() {
+  return `
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:-apple-system,'Segoe UI','Microsoft YaHei',sans-serif; color:#111827; background:#fff; }
+    .brandbar { background:linear-gradient(90deg,#1e3a8a,#2563eb); color:#fff; padding:14px 22px; display:flex; align-items:center; justify-content:space-between; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .brandbar .logo { font-size:18px; font-weight:800; letter-spacing:.5px; }
+    .brandbar .logo span { color:#facc15; }
+    .brandbar .tag { font-size:12px; opacity:.92; }
+    .wrap { padding: 0 4mm; }
+    h1 { font-size:22px; margin:6px 0 4px; color:#0f172a; }
+    .meta { display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 6px; }
+    .chip { font-size:12px; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; padding:4px 10px; border-radius:999px; }
+    .summary { margin:14px 0 18px; padding:14px 16px; background:#f8fafc; border-left:4px solid #2563eb; border-radius:8px; font-size:14px; line-height:1.75; color:#334155; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .summary b { color:#1e3a8a; }
+    .sec-title { font-size:13px; font-weight:700; color:#1e3a8a; margin:18px 0 8px; letter-spacing:.5px; }
+    .bars { margin-bottom:4px; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    thead th { background:#1e3a8a; color:#fff; padding:10px 12px; text-align:left; font-weight:600; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    thead th.num { text-align:right; }
+    tbody tr { break-inside: avoid; }
+    tfoot td { padding:10px 12px; border-top:2px solid #1e3a8a; font-weight:700; background:#eff6ff; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    tfoot td.num { text-align:right; }
+    .foot { margin-top:22px; padding-top:10px; border-top:1px solid #e5e7eb; color:#9ca3af; font-size:11px; display:flex; justify-content:space-between; }
+    @page { size: A4; margin: 14mm; }
+    @page { @bottom-right { content: "第 " counter(page) " 页 / 共 " counter(pages) " 页"; font-size:10px; color:#9ca3af; } }
+  `;
+}
+
+// Inner content (no <html>/<head> wrapper) — used by html2canvas capture & print doc
 function _buildReportExportHTML(r) {
   const rows = r.rows || [];
   const total = r.total || 0;
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const maxVal = Math.max(1, ...rows.map(x => x.val || 0));
+  const flowLabel = ({insight:'分组统计',topn:'排名 TopN',detail:'明细查询',dict:'数据字典'}[r.flow] || '数据分析');
+  const chartLabel = ({bar:'柱状图',line:'折线图',pie:'饼图'}[r.chart] || '图表');
+  const bars = rows.map(row => {
+    const pct = total > 0 ? (row.val || 0) / total * 100 : 0;
+    const w = Math.round((row.val || 0) / maxVal * 100);
+    return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;">
+      <div style="width:92px;font-size:12px;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(row.dim)}</div>
+      <div style="flex:1;height:18px;background:#eef2ff;border-radius:9px;overflow:hidden;">
+        <div style="height:100%;width:${w}%;background:linear-gradient(90deg,#3b82f6,#1e3a8a);border-radius:9px;"></div>
+      </div>
+      <div style="width:108px;text-align:right;font-size:12px;color:#111827;font-variant-numeric:tabular-nums;">${(row.val||0).toLocaleString()} <span style="color:#9ca3af;">(${pct.toFixed(1)}%)</span></div>
+    </div>`;
+  }).join('');
   const rowsHtml = rows.map((row, i) => {
     const pct = total > 0 ? Math.round((row.val || 0) / total * 100) : 0;
-    return `<tr><td>${i + 1}</td><td>${esc(row.dim)}</td><td style="text-align:right">${(row.val || 0).toLocaleString()}</td><td style="text-align:right">${pct}%</td></tr>`;
+    const bg = i % 2 === 0 ? '#ffffff' : '#f8fafc';
+    return `<tr style="background:${bg};">
+      <td style="padding:9px 12px;border-bottom:1px solid #e5e7eb;color:#6b7280;">${i + 1}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid #e5e7eb;">${esc(row.dim)}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid #e5e7eb;text-align:right;font-variant-numeric:tabular-nums;font-weight:600;color:#111827;">${(row.val||0).toLocaleString()}</td>
+      <td style="padding:9px 12px;border-bottom:1px solid #e5e7eb;text-align:right;color:#2563eb;font-weight:600;">${pct}%</td>
+    </tr>`;
   }).join('');
-  return `<div style="font-family:-apple-system,'Segoe UI','Microsoft YaHei',sans-serif;color:#111827;padding:32px;background:#fff;">
-    <h1 style="font-size:20px;margin:0 0 6px;">${esc(r.title)}</h1>
-    <div style="color:#6b7280;font-size:12px;margin-bottom:16px;">DataBrain · 智能分析报表 · 生成时间：${esc(r.time || '')} · 数据源：${esc(r.tableAlias || '—')}</div>
-    <div style="font-size:14px;line-height:1.7;margin-bottom:18px;color:#374151;">${esc(r.summary || '')}</div>
-    <table style="width:100%;border-collapse:collapse;font-size:13px;">
-      <thead><tr>
-        <th style="padding:8px 10px;border-bottom:1px solid #e5e7eb;text-align:left;background:#f9fafb;">#</th>
-        <th style="padding:8px 10px;border-bottom:1px solid #e5e7eb;text-align:left;background:#f9fafb;">${esc(r.dimLabel || '维度')}</th>
-        <th style="padding:8px 10px;border-bottom:1px solid #e5e7eb;text-align:right;background:#f9fafb;">${esc(r.metricLabel || '数值')}</th>
-        <th style="padding:8px 10px;border-bottom:1px solid #e5e7eb;text-align:right;background:#f9fafb;">占比</th>
-      </tr></thead>
-      <tbody>${rowsHtml}</tbody>
-      <tfoot><tr>
-        <td colspan="2" style="padding:8px 10px;border-top:2px solid #d1d5db;font-weight:600;">合计</td>
-        <td style="padding:8px 10px;border-top:2px solid #d1d5db;font-weight:600;text-align:right;">${total.toLocaleString()}</td>
-        <td style="padding:8px 10px;border-top:2px solid #d1d5db;font-weight:600;text-align:right;">100%</td>
-      </tr></tfoot>
-    </table>
-    <div style="margin-top:24px;color:#9ca3af;font-size:11px;">本报表由 DataBrain AI 自动生成，仅供参考。</div>
-  </div>`;
+  return `
+    <div class="brandbar"><div class="logo">Data<span>Brain</span></div><div class="tag">智能数据分析报表</div></div>
+    <div class="wrap" style="padding-top:16px;">
+      <h1>${esc(r.title)}</h1>
+      <div class="meta">
+        <span class="chip">🕒 生成时间：${esc(r.time || '')}</span>
+        <span class="chip">🗄 数据源：${esc(r.tableAlias || '—')}</span>
+        <span class="chip">📊 分析类型：${esc(flowLabel)}</span>
+        <span class="chip">📈 图表类型：${esc(chartLabel)}</span>
+      </div>
+      <div class="summary">${esc(r.summary || '')}</div>
+      <div class="sec-title">数据可视化</div>
+      <div class="bars">${bars}</div>
+      <div class="sec-title">明细数据</div>
+      <table>
+        <thead><tr>
+          <th style="width:48px;">#</th>
+          <th>${esc(r.dimLabel || '维度')}</th>
+          <th class="num">${esc(r.metricLabel || '数值')}</th>
+          <th class="num" style="width:80px;">占比</th>
+        </tr></thead>
+        <tbody>${rowsHtml}</tbody>
+        <tfoot><tr>
+          <td colspan="2">合计</td>
+          <td class="num">${total.toLocaleString()}</td>
+          <td class="num">100%</td>
+        </tr></tfoot>
+      </table>
+      <div class="foot"><span>本报表由 DataBrain AI 自动生成，数据仅供参考</span><span>${esc(r.time || '')}</span></div>
+    </div>`;
 }
 
-function exportReportPDF(id) {
-  const rid = id || _lastViewedReportId;
-  const r = reports.find(x => x.id === rid);
-  if (!r) { showToast('没有可导出的报表'); return; }
-  showToast('⏳ 正在生成 PDF...');
-  if (window.DM_TRACK) DM_TRACK.resultExport({ export_format: 'pdf' });
-
-  const finish = (ok, msg) => showToast(msg || (ok ? '✅ 导出成功' : '❌ 导出失败，请重试'));
-  const fileName = (r.title || 'report').replace(/[\\/:*?"<>|]/g, '_') + '.pdf';
-
-  // 最终兜底：直接下载独立 HTML 报告文件，浏览器打开后 Ctrl+P 另存为 PDF
-  const runDownloadFallback = () => {
-    try {
-      const html = '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>' + (r.title || '报告') + '</title>' +
-        '<style>body{margin:0}@media print{body{margin:12px}}</style></head><body>' + _buildReportExportHTML(r) + '</body></html>';
-      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = (r.title || 'report').replace(/[\\/:*?"<>|]/g, '_') + '.html';
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
-      finish(true, '✅ 报告已下载，打开文件后 Ctrl+P →「另存为 PDF」即可导出');
-    } catch (e) { finish(false); }
-  };
-
-  const runPrintFallback = () => {
-    try {
-      const w = window.open('', '_blank');
-      if (!w) { runDownloadFallback(); return; }
-      w.document.open();
-      w.document.write('<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>' + (r.title || '报告') + '</title></head><body>' + _buildReportExportHTML(r) + '</body></html>');
-      w.document.close();
-      setTimeout(() => { try { w.focus(); w.print(); } catch (e) {} finish(true); }, 400);
-    } catch (e) { runDownloadFallback(); }
-  };
-
-  if (window.html2canvas && window.jspdf && window.jspdf.jsPDF) {
-    const holder = document.createElement('div');
-    holder.style.position = 'fixed';
-    holder.style.left = '-99999px';
-    holder.style.top = '0';
-    holder.style.width = '794px';
-    holder.style.background = '#ffffff';
-    holder.innerHTML = _buildReportExportHTML(r);
-    document.body.appendChild(holder);
-    html2canvas(holder, { scale: 2, backgroundColor: '#ffffff', useCORS: true }).then(canvas => {
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pageW = 210, pageH = 297, margin = 10;
-      const imgW = pageW - margin * 2;
-      const imgH = canvas.height * imgW / canvas.width;
-      const img = canvas.toDataURL('image/png');
-      const pageContentH = pageH - margin * 2;
-      let offset = 0;
-      while (offset < imgH) {
-        if (offset > 0) pdf.addPage();
-        pdf.addImage(img, 'PNG', margin, margin - offset, imgW, imgH);
-        offset += pageContentH;
-      }
-      try { document.body.removeChild(holder); } catch (e) {}
-      pdf.save(fileName);
-      finish(true);
-    }).catch(() => { try { document.body.removeChild(holder); } catch (e) {} runPrintFallback(); });
-  } else {
-    runPrintFallback();
-  }
+// Full standalone document (with @page + print CSS) for the browser print path
+function _buildReportPrintDoc(r) {
+  return '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>' + (r.title || '报告') + '</title><style>' + _reportExportCSS() + '</style></head><body>' + _buildReportExportHTML(r) + '</body></html>';
 }
 
 function closeSaveReportModal() {
@@ -9492,6 +9992,8 @@ renderReports();
 </div>
 
 
+
+
 <!-- 飞书日志接入 -->
 <script>
 /**
@@ -10020,9 +10522,10 @@ function getClickElementInfo(el) {
   var tag = el.tagName ? el.tagName.toLowerCase() : '';
   var track = el.getAttribute ? (el.getAttribute('data-track') || '') : '';
   var action = el.getAttribute ? (el.getAttribute('onclick') || '').slice(0, 80) : '';
+  var pnid = el.getAttribute ? (el.getAttribute('data-page-' + 'node-id') || '') : '';
   var text = (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 50);
   var cls = (el.className && typeof el.className === 'string') ? el.className.trim().split(/\s+/).slice(0, 3).join('.') : '';
-  return { id: id, tag: tag, track: track, action: action, text: text, cls: cls };
+  return { id: id, tag: tag, track: track, action: action, pnid: pnid, text: text, cls: cls };
 }
 // 全局点击上报（携带元素标识）
 document.addEventListener("click", function(e){
@@ -10033,7 +10536,7 @@ document.addEventListener("click", function(e){
     var sendData = {
       user_id: "demo_user_01",
       event_name: "page_click",
-      page: "/index.html",
+      page: "/databrain.html",
       device: "pc",
       payload: {
         session_id: getSessionId(),
@@ -10041,11 +10544,12 @@ document.addEventListener("click", function(e){
         element_tag: info.tag || '',
         element_track: info.track || '',
         element_action: info.action || '',
+        element_pnid: info.pnid || '',
         element_text: info.text || '',
         element_cls: info.cls || ''
       }
     };
-    if (TRACK_URL) fetch(TRACK_URL, {
+    fetch(TRACK_URL, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify(sendData)
@@ -10085,12 +10589,11 @@ document.addEventListener("click", function(e){
   window.DM_SET_LAST_STEP = function (s) { if (s) DM_LAST_STEP = s; };
 
   function dmTrack(eventName, payload) {
-    if (!TRACK_URL) return;
     try {
       var data = {
         user_id: USER_ID,
         event_name: eventName,
-        page: "/index.html",
+        page: "/databrain.html",
         device: getDMDevice(),
         payload: Object.assign({ session_id: getDMSessionId() }, payload || {})
       };
